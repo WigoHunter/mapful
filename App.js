@@ -11,7 +11,7 @@ const RootTabs = TabNavigator({
   Home: {
     screen: () => <Home />,
     navigationOptions: {
-      title: "HOME",
+      title: "Home",
       tabBarIcon: <Icon name="home" color="black" />
     }
   },
