@@ -11,7 +11,7 @@ const RootTabs = TabNavigator({
   Home: {
     screen: () => <Home />,
     navigationOptions: {
-      title: "Home",
+      title: "HOME",
       tabBarIcon: <Icon name="home" color="black" />
     }
   },
@@ -19,7 +19,7 @@ const RootTabs = TabNavigator({
   Discover: {
     screen: () => <Discover />,
     navigationOptions: {
-      title: "Discover",
+      title: "DISCOVER",
       tabBarIcon: <Icon name="star" color="black" />
     }
   },
@@ -27,7 +27,7 @@ const RootTabs = TabNavigator({
   Profile: {
     screen: () => <Home />,
     navigationOptions: {
-      title: "Profile",
+      title: "PROFILE",
       tabBarIcon: <Icon name="face" color="black" />
     }
   }
