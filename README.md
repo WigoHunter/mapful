@@ -15,3 +15,17 @@ npm start
 - [React Native Elements](https://react-native-training.github.io/react-native-elements/)
 - [React Navigation](https://reactnavigation.org/)
 - [React MapView](https://github.com/airbnb/react-native-maps)
+
+
+### Git Operations
+- Push updates
+```
+git add .
+git commit -m "{commit message}"
+git push -u origin master
+```
+
+- Get updates
+```
+git pull
+```
