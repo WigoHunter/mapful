@@ -46,6 +46,9 @@ const styles = StyleSheet.create({
 });
 
 export default class Profile extends React.Component {
+	static navigationOptions = {
+    tabBarLabel: 'Profile'
+  };
     render() {
     let pic = {
       uri: 'http://assets.nydailynews.com/polopoly_fs/1.2181344.1428731676!/img/httpImage/image.jpg_gen/derivatives/article_750/bigbang11n-2-web.jpg'
