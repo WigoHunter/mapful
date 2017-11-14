@@ -3,7 +3,6 @@ import { StyleSheet, Alert, Button, Text, TextInput, View, Image } from 'react-n
 import { Icon } from 'react-native-elements';
 import { TabNavigator } from 'react-navigation';
 import { Header } from 'react-native-elements';
-import LinearGradient from 'react-native-linear-gradient';
 
 import Home from './components/Home.js';
 import Discover from './components/Discover.js';
@@ -90,11 +89,20 @@ export default class App extends React.Component {
                 ? (Alert.alert('This username has been registered'))
                 :(
                   db.collection('User')
-                    .insert({ username: this.state.username, pass: this.state.pass})
+                    .insert({
+                      username: this.state.username,
+                      pass: this.state.pass,
+                      profile: {
+                        pic: '',
+                        intro: '',
+                        follow: [],
+                        followers: [],
+                      }
+                    })
                     .then(_ => {
                      this._onPressLogin(); 
                     })
-                    .catch(err => { console.error(err) })
+                    .catch(err => { console.error(err); })
                 )
               )
             )
