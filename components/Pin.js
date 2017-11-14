@@ -22,7 +22,7 @@ export default class Pin extends React.Component {
 												latitude:0,
 												longitude:0
 												},
-									txt:'',title:''};
+									txt:'',title:'',map:false};
 		
 	}
 	_onPressCurrentLocation() {
@@ -43,6 +43,9 @@ export default class Pin extends React.Component {
 			Alert.alert('Cannot get your location information!')
 			}, Options);
 	}
+	_onPressLocationOnMap() {
+	this.setState({map:true});
+	}
 	_onPressPin() {
 		if(this.state.title==''){
 			Alert.alert('Title/Text cannot be empty!');
@@ -60,7 +63,11 @@ export default class Pin extends React.Component {
 		{/*debug:print all the pins on the database*/}
 		db.collection('Pins').find({}).then(docs=>{console.log(docs)})
 	}
+	_onPressMap(e) {
+		this.setState({map:false});
+	}
     render() {
+	  if(this.state.map==false)
       return (
         <View>
 			<View style={{flexDirection: 'row'}}>
@@ -68,7 +75,7 @@ export default class Pin extends React.Component {
 				<Button style={{width : 40,height:40}} onPress={this._onPressCurrentLocation.bind(this)}	title="Use my current location"/>
 			</View>
 			<View style={{marginLeft:60,width: 240, height: 50}} >
-				<Button  onPress={this._onPressCurrentLocation.bind(this)}	title="Choose a place on the map"/>
+				<Button  onPress={this._onPressLocationOnMap.bind(this)}	title="Choose a place on the map"/>
 				</View>
 			<View style={{flexDirection: 'row',marginLeft:60}}>
 				<Text>latitude:{this.state.location.latitude} </Text>
@@ -89,5 +96,26 @@ export default class Pin extends React.Component {
 			</View>
         </View>
       );
+	  return (
+	 
+        <View style={{ flex: 1, flexDirection: 'column' }}>
+			<View style={{ flexDirection: 'row' }}>
+				<Button style={{ top :150,left:100,width:10}} onPress= {()=>this.setState({map:false})}	title="Back"/>
+				<Text>Choose a place on the map</Text>
+			</View>
+            <MapView
+                style={{ flex: 1 }}
+                initialRegion={{
+                    latitude: 37.78825,
+                    longitude: -122.4324,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }}
+				onPress = {(e) => 
+					this.setState({map:false,location:e.nativeEvent.coordinate})
+					}
+            />
+        </View>
+	  )
     }
 }
