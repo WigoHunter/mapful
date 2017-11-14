@@ -62,9 +62,9 @@ export default class App extends React.Component {
 		super(props);
 		this.state = {
       username: '',
-      pass:'',
-      id:0,
-      isLoggedIn:false
+      pass: '',
+      id: 0,
+      isLoggedIn: false
     };
   }
   
@@ -72,7 +72,7 @@ export default class App extends React.Component {
     db.collection('User')
       .find({ username: this.state.username, pass: this.state.pass })
       .then(docs => { docs.length
-        ? (Alert.alert('Success!'), this.setState({isLoggedIn:true}))
+        ? (this.setState({isLoggedIn:true}))
         : (Alert.alert('Incorrect username/password!'))
       })
   }
@@ -155,7 +155,7 @@ export default class App extends React.Component {
               centerComponent={{ text: '', style: { fontSize: 16, color: '#FFF' } }}
               backgroundColor="#1EE494"
           />
-          <RootTabs screenProps={{user:this.state.username}} />
+          <RootTabs screenProps={{user: this.state.username}} />
         </View>
       );
     }
