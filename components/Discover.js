@@ -18,24 +18,34 @@ export default class Discover extends React.Component {
     super(props);
 
     this.state = {
-      latitude: 22.28240357248325,
-      longitude: 114.12782309587497,
+      region: {
+        latitude: 32.282462956240902,
+        longitude: 114.1280245223424,
+        latitudeDelta: 0.0922,
+        longitudeDelta: 0.0421,
+      },
       pins: [],
     };
+
+    this.OnRegionChange = this.OnRegionChange.bind(this);
   }
 
   componentDidMount() {
     const Options = {
-      enableHighAccuracy: true,
-      timeout: 5000,
+      enableHighAccuracy: false,
+      timeout: 1000,
       maximumAge: 0
     };
 
     navigator.geolocation.getCurrentPosition(pos => {
       this.setState({
-        latitude: pos.coords.latitude,
-        longitude: pos.coords.longitude,
-      })
+        region: {
+          latitude: pos.coords.latitude,
+          longitude: pos.coords.longitude,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421
+        }
+      });
     }, Options);
 
     db.collection('Pins')
@@ -43,19 +53,19 @@ export default class Discover extends React.Component {
       .then(pins => this.setState({ pins }));
   }
 
+  OnRegionChange(region) {
+    this.setState({ region });
+  }
+
   render() {
-    const { latitude, longitude, pins } = this.state;
+    const { region, pins } = this.state;
 
     return (
       <View style={{ flex: 1 }}>
         <MapView
           style={{ flex: 1 }}
-          initialRegion={{
-            latitude,
-            longitude,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
-          }}
+          region={region}
+          onRegionChange={this.onRegionChange}
         >
           {pins.map(pin =>
             <MapView.Marker
