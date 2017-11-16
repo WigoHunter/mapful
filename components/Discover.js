@@ -22,14 +22,13 @@ export default class Discover extends React.Component {
     super(props);
 
     this.state = {
-      user: this.props.screenProps.user,
       region: {
         latitude: 32.282462956240902,
         longitude: 114.1280245223424,
         latitudeDelta: 0.0922,
         longitudeDelta: 0.0421,
       },
-      pins: [],
+      pins: []
     };
 
     this.OnRegionChange = this.OnRegionChange.bind(this);
@@ -37,7 +36,7 @@ export default class Discover extends React.Component {
     this.likePin = this.likePin.bind(this);
   }
 
-  componentDidMount() {
+  componentWillMount() {
     const Options = {
       enableHighAccuracy: false,
       timeout: 1000,
@@ -54,7 +53,7 @@ export default class Discover extends React.Component {
         }
       });
     }, Options);
-
+    
     this.updatePins();
   }
 
@@ -70,11 +69,11 @@ export default class Discover extends React.Component {
   
   likePin(id) {
     db.collection('Pins')
-      .updateOne(
+      .updateMany(
         { _id: id },
-        { $addToSet: { likes: this.state.user } },
-        { upsert: true }
+        { $addToSet: { 'likes': this.props.screenProps.user } }
       )
+      .then(() => this.updatePins());
   }
 
   render() {
@@ -130,10 +129,9 @@ export default class Discover extends React.Component {
 
 const Callout = ({ pin, likePin }) => (
   <ScrollView contentContainerStyle={styles.callout}>
-    {console.log(pin)}
     <Text style={styles.title}>{pin.title}</Text>
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <Text onPress={() => likePin(pin._id)}>like</Text>
+      <Text onPress={() => likePin(pin._id)}>{pin.likes ? pin.likes.length : 0} likes</Text>
       <Text style={styles.username}>{pin.username}</Text>
       <Text style={styles.time}>{`${pin.time.getDate()} / ${pin.time.getMonth()} / ${pin.time.getFullYear()}`}</Text>
     </View>
