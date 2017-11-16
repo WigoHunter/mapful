@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, ScrollView, Text, Image } from 'react-native';
+import { Alert, StyleSheet, View, ScrollView, Text, Image } from 'react-native';
 import { Header, Icon } from 'react-native-elements';
 import MapView from 'react-native-maps';
 
@@ -14,10 +14,15 @@ client.login().then(() =>
 });
 
 export default class Discover extends React.Component {
+  static navigationOptions = {
+    tabBarLabel: 'Discover'
+  };
+
 	constructor(props) {
     super(props);
 
     this.state = {
+      user: this.props.screenProps.user,
       region: {
         latitude: 32.282462956240902,
         longitude: 114.1280245223424,
@@ -29,6 +34,7 @@ export default class Discover extends React.Component {
 
     this.OnRegionChange = this.OnRegionChange.bind(this);
     this.updatePins = this.updatePins.bind(this);
+    this.likePin = this.likePin.bind(this);
   }
 
   componentDidMount() {
@@ -60,6 +66,15 @@ export default class Discover extends React.Component {
     db.collection('Pins')
       .find({})
       .then(pins => this.setState({ pins }));
+  }
+  
+  likePin(id) {
+    db.collection('Pins')
+      .updateOne(
+        { _id: id },
+        { $addToSet: { likes: this.state.user } },
+        { upsert: true }
+      )
   }
 
   render() {
@@ -103,7 +118,7 @@ export default class Discover extends React.Component {
               }}
             >
               <MapView.Callout style={{ zIndex: 10000 }}>
-                <Callout pin={pin} />
+                <Callout pin={pin} likePin={this.likePin} />
               </MapView.Callout>
             </MapView.Marker>
           )}
@@ -113,10 +128,12 @@ export default class Discover extends React.Component {
   }
 }
 
-const Callout = ({ pin }) => (
+const Callout = ({ pin, likePin }) => (
   <ScrollView contentContainerStyle={styles.callout}>
+    {console.log(pin)}
     <Text style={styles.title}>{pin.title}</Text>
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+      <Text onPress={() => likePin(pin._id)}>like</Text>
       <Text style={styles.username}>{pin.username}</Text>
       <Text style={styles.time}>{`${pin.time.getDate()} / ${pin.time.getMonth()} / ${pin.time.getFullYear()}`}</Text>
     </View>

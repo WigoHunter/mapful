@@ -103,7 +103,8 @@ export default class Pin extends React.Component {
 																			title:this.state.title, 
 																			location:this.state.location,
 																			time:new Date(),
-																			comment:[],
+																			comments:[],
+																			likes: [],
 																			image:this.state.imgArr}).catch(err => {console.error(err),
 					error=true;
 						
