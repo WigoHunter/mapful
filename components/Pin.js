@@ -23,7 +23,7 @@ export default class Pin extends React.Component {
 												latitude:0,
 												longitude:0
 												},
-									txt:'',title:'',numImg:0,img:[],base64:[],map:false,imgArr:[]};
+									txt:'',title:'',numImg:0,img:[],map:false,imgArr:[]};
 		this._onPressCurrentLocation();
 	}
 	
@@ -79,7 +79,7 @@ export default class Pin extends React.Component {
 	async _onPressUploadImg() {
 			var res=await Expo.ImagePicker.launchImageLibraryAsync({base64:true});
 			if(res.cancelled==false){
-				this.setState({img:[...this.state.img, res.uri],base64:[...this.state.base64, res.base64],numImg:(this.state.numImg+1)})
+				this.setState({img:[...this.state.img, {path:res.uri,base64:res.base64}],numImg:(this.state.numImg+1)})
 			}
 	}
 	 _onPressPin() {
@@ -89,8 +89,8 @@ export default class Pin extends React.Component {
 		}
 		if(this.state.numImg>0){
 			console.log('start uploading images');
-			{this.state.base64.map(async (obj,i) =>{
-						var url= 'data:image/jpeg;base64,'+obj
+			{this.state.img.map(async (obj,i) =>{
+						var url= 'data:image/jpeg;base64,'+obj.base64
 						this.uploadImage(url)
 			}
 			)}
@@ -146,12 +146,20 @@ export default class Pin extends React.Component {
 			<View style={{flexDirection: 'row',marginLeft:60}}>
 				<Button  onPress={this._onPressUploadImg.bind(this)}	title="Upload Image"/>
 			</View>
-			<View style={{flexDirection: 'row',marginLeft:60}}>
-					 {this.state.img.map((obj,i) =>
-					<Image key={i} source={{uri:obj}} style={{
+			<View style={{flexDirection: 'row',marginLeft:60,marginRight:60, flexWrap: 'wrap', alignItems: 'flex-start'}}>
+				{this.state.img.map((obj,i) =>
+					<View key={i}style={{flexDirection:'column'}}>
+					<Image key={i+1000} source={{uri:obj.path}} style={{
 																								height:100,
 																								width:100,
-																															}}/>
+																																}}/>
+					<Text key={i-2000} style={{color:'blue',alignSelf:'center',textDecorationLine:'underline'}} onPress={()=>{
+					  var array = this.state.img;
+					  array.splice(i, 1);
+					  this.setState({img: array,numImg:this.state.numImg-1});
+					  }}
+						>Delete</Text>
+					</View>
 				  )}
 			</View>
 			<View style={{flexDirection: 'row',marginTop:10}}>
