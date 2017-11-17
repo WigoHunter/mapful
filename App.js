@@ -126,10 +126,10 @@ export default class App extends React.Component {
             />
             <Text style={{fontSize: 32, marginBottom: 25, color: '#FFF'}}>Mapful</Text>
             <View style={{ flexDirection: 'row', margin: 10, alignItems: 'center' }}>
-                <Text>Username</Text><TextInput maxLength={20}  style={styles.input}  placeholder="username" onChangeText={(username) => this.setState({username})}/>
+                <Text>Username</Text><TextInput maxLength={20}  autoCorrect={false} style={styles.input}  placeholder="username" onChangeText={(username) => this.setState({username})} onSubmitEditing={(event)=>{this.refs.pass.focus()}}/>
             </View>
             <View style={{ flexDirection: 'row', margin: 10, alignItems: 'center' }}>
-                <Text>Password</Text><TextInput secureTextEntry={true} maxLength = {20}  style={styles.input}  placeholder="password" onChangeText={(pass) => this.setState({pass})}/>
+                <Text>Password</Text><TextInput ref='pass' secureTextEntry={true} maxLength = {20}  style={styles.input}  placeholder="password" onChangeText={(pass) => this.setState({pass})}/>
             </View>
 
             <View style={{flexDirection: 'row',alignItems: 'center', justifyContent: 'center', marginTop: 30 }} >

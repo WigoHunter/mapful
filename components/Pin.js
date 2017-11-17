@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, Button, View, TextInput, Text, Alert, Image } from 'react-native';
+import { StyleSheet, Button, View, TextInput, ScrollView, Text, Alert, Image } from 'react-native';
 import { Header, Icon } from 'react-native-elements';
 import MapView from 'react-native-maps';
 import TimerMixin from 'react-timer-mixin';
@@ -24,7 +24,7 @@ export default class Pin extends React.Component {
 												longitude:0
 												},
 									txt:'',title:'',numImg:0,img:[],base64:[],map:false,imgArr:[]};
-		
+		this._onPressCurrentLocation();
 	}
 	
 
@@ -87,17 +87,20 @@ export default class Pin extends React.Component {
 			Alert.alert('Title/Text cannot be empty!');
 			return;
 		}
-		{this.state.base64.map(async (obj,i) =>{
-					var url= 'data:image/jpeg;base64,'+obj
-					console.log('uploading imgs');
-					this.uploadImage(url)
+		if(this.state.numImg>0){
+			console.log('start uploading images');
+			{this.state.base64.map(async (obj,i) =>{
+						var url= 'data:image/jpeg;base64,'+obj
+						this.uploadImage(url)
+			}
+			)}
+			console.log('uploading finished, waiting for response from the server');
 		}
-		)}
-		console.log('uploading finished');
 		var error=false;
 		var tid = setInterval(function(){
 			if(this.state.imgArr.length>=this.state.img.length){
 				clearInterval(tid);
+				console.log('start uploading data');
 				db.collection('Pins').insert({username: this.props.screenProps.user,
 																			txt:this.state.txt, 
 																			title:this.state.title, 
@@ -126,7 +129,7 @@ export default class Pin extends React.Component {
     render() {
 	  if(this.state.map==false)
       return (
-        <View>
+        <ScrollView>
 			<View style={{flexDirection: 'row'}}>
 				<Text>Location: </Text>
 				<Button style={{width : 40,height:40}} onPress={this._onPressCurrentLocation.bind(this)}	title="Use my current location"/>
@@ -162,27 +165,59 @@ export default class Pin extends React.Component {
 			<View style={{marginLeft:120,marginTop:30,width: 100, height: 80}} >
 				<Button style={{ top :150,left:100,width:10}} onPress={this._onPressPin.bind(this)}	title="Pin"/>
 			</View>
-        </View>
+        </ScrollView>
       );
 	  return (
 	 
         <View style={{ flex: 1, flexDirection: 'column' }}>
-			<View style={{ flexDirection: 'row' }}>
-				<Button style={{ top :150,left:100,width:10}} onPress= {()=>this.setState({map:false})}	title="Back"/>
-				<Text>Choose a place on the map</Text>
-			</View>
             <MapView
                 style={{ flex: 1 }}
                 initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
+                    latitude: this.state.location.latitude,
+                    longitude: this.state.location.longitude,
+                    latitudeDelta: 0.5,
+                    longitudeDelta: 0.5,
                 }}
 				onPress = {(e) => 
-					this.setState({map:false,location:e.nativeEvent.coordinate})
+					this.setState({location:e.nativeEvent.coordinate})
 					}
-            />
+            >
+				<MapView.Marker
+				  coordinate={{
+					latitude: this.state.location.latitude,
+					longitude: this.state.location.longitude
+				  }}
+				/>
+			</MapView>
+			<View style={{ 
+			  position: 'absolute',
+			  zIndex: 100,
+			  top: 10,
+			  left: 10
+			}}>
+				<Button style={{width:10}} onPress= {()=>this.setState({map:false})}	title="Back"/>
+			</View>
+			<View style={{ 
+				
+			  position: 'absolute',
+			  zIndex: 100,
+			  top: 60,
+			  alignSelf: 'center'
+			}}>
+				<Text style = {{color:'green'}}>Choose a place on the map</Text>
+			</View>
+			<View style={{
+			  position: 'absolute',
+			  zIndex: 100,
+			  bottom: 50,
+			  alignSelf: 'center'
+			}}>
+				<Text style={{borderColor: '#FFFFFF',
+							  borderWidth: 1,
+							  borderRadius: 110,
+							  backgroundColor: '#FFFFFF'}}>
+					latitude:{this.state.location.latitude.toFixed(3)} longitude:{this.state.location.longitude.toFixed(3)}</Text>
+			</View>
         </View>
 	  )
     }
