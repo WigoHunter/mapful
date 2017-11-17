@@ -69,7 +69,7 @@ export default class Discover extends React.Component {
   
   likePin(id) {
     db.collection('Pins')
-      .updateMany(
+      .updateOne(
         { _id: id },
         { $addToSet: { 'likes': this.props.screenProps.user } }
       )
@@ -106,7 +106,7 @@ export default class Discover extends React.Component {
           style={{ flex: 1 }}
           region={region}
           showsCompass={false}
-          onRegionChange={this.onRegionChange}
+          onRegionChangeComplete={(r) => this.OnRegionChange(r)}
         >
           {pins.map(pin =>
             <MapView.Marker
