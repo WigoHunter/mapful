@@ -67,12 +67,17 @@ export default class App extends React.Component {
       isLoggedIn: false
     };
   }
-  
+  update() {
+	  console.log('receivecallback');
+    db.collection('User')
+      .find({ username: this.state.username, pass: this.state.pass })
+      .then(docs => {(this.setState({userData:docs[0].profile}))})
+  }
 	_onPressLogin() {
     db.collection('User')
       .find({ username: this.state.username, pass: this.state.pass })
       .then(docs => { docs.length
-        ? (this.setState({isLoggedIn:true}))
+        ? (this.setState({isLoggedIn:true,userData:docs[0].profile}))
         : (Alert.alert('Incorrect username/password!'))
       })
   }
@@ -93,7 +98,7 @@ export default class App extends React.Component {
                       username: this.state.username,
                       pass: this.state.pass,
                       profile: {
-                        pic: '',
+                        pic: {version:'',id:''},
                         intro: '',
                         follow: [],
                         followers: [],
@@ -155,7 +160,7 @@ export default class App extends React.Component {
               centerComponent={{ text: '', style: { fontSize: 16, color: '#FFF' } }}
               backgroundColor="#1EE494"
           />
-          <RootTabs screenProps={{user: this.state.username}} />
+          <RootTabs screenProps={{user: this.state.username,userData:this.state.userData,callback:this.update.bind(this)}} />
         </View>
       );
     }
