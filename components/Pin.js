@@ -101,17 +101,16 @@ export default class Pin extends React.Component {
 			if(this.state.imgArr.length>=this.state.img.length){
 				clearInterval(tid);
 				console.log('start uploading data');
-				db.collection('Pins').insert({username: this.props.screenProps.user,
-																			txt:this.state.txt, 
-																			title:this.state.title, 
-																			location:this.state.location,
-																			time:new Date(),
-																			comments:[],
-																			likes: [],
-																			image:this.state.imgArr}).catch(err => {console.error(err),
+				db.collection('Pins').insert({
+					username: this.props.screenProps.user,
+					txt:this.state.txt, 
+					title:this.state.title, 
+					location:this.state.location,
+					time:new Date(),
+					comments:[],
+					likes: [],
+					image:this.state.imgArr}).catch(err => {console.error(err),
 					error=true;
-						
-					
 			})
 		
 			if(error){

@@ -1,6 +1,7 @@
 import React from 'react';
-import { Alert, StyleSheet, View, ScrollView, Text, Image } from 'react-native';
-import { Header, Icon } from 'react-native-elements';
+import { Alert, StyleSheet, TouchableOpacity, View, ScrollView, Text, Image, TextInput, Button } from 'react-native';
+import { Header } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import MapView from 'react-native-maps';
 
 const stitch = require("mongodb-stitch");
@@ -117,7 +118,7 @@ export default class Discover extends React.Component {
               }}
             >
               <MapView.Callout style={{ zIndex: 10000 }}>
-                <Callout pin={pin} likePin={this.likePin} />
+                <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} />
               </MapView.Callout>
             </MapView.Marker>
           )}
@@ -127,36 +128,93 @@ export default class Discover extends React.Component {
   }
 }
 
-const Callout = ({ pin, likePin }) => (
-  <ScrollView contentContainerStyle={styles.callout}>
-    <Text style={styles.title}>{pin.title}</Text>
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <Text onPress={() => likePin(pin._id)}>{pin.likes ? pin.likes.length : 0} likes</Text>
-      <Text style={styles.username}>{pin.username}</Text>
-      <Text style={styles.time}>{`${pin.time.getDate()} / ${pin.time.getMonth()} / ${pin.time.getFullYear()}`}</Text>
-    </View>
-    {(pin.image != null && pin.image.length > 0) &&
-      <Image
-        source={{
-          uri: `https://res.cloudinary.com/comp33302017/image/upload/v${pin.image[0].version}/${pin.image[0].id}`
+class Callout extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.onSubmitComment = this.onSubmitComment.bind(this);
+  }
+
+  onSubmitComment(txt) {
+    db.collection('Pins')
+      .updateOne(
+        { _id: this.props.pin._id },
+        { $push: { 'comments': {
+            txt,
+            pic: `https://res.cloudinary.com/comp33302017/image/upload/v${this.props.userData.pic.version}/${this.props.userData.pic.id}`
+          }
         }}
-        style={{
-          width: 200,
-          height: 200,
-          marginBottom: 10,
-          marginTop: 10,
-          marginLeft: 'auto',
-          marginRight: 'auto',
-        }}
-      />
-    }
-    <Text style={styles.txt}>{pin.txt}</Text>
-  </ScrollView>
-);
+      )
+      .then(() => this.props.updatePins())
+      .then(() => this.textInput.clear());
+  }
+
+  render() {
+    const { pin, updatePins, likePin, user } = this.props;
+    
+    return (
+      <ScrollView style={styles.callout}>
+        <Text style={styles.title}>{pin.title}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={styles.username}>{pin.username}</Text>
+          <Text style={styles.time}>{`${pin.time.getDate()} / ${pin.time.getMonth()} / ${pin.time.getFullYear()}`}</Text>
+        </View>
+        {(pin.image != null && pin.image.length > 0) &&
+          <Image
+            source={{
+              uri: `https://res.cloudinary.com/comp33302017/image/upload/v${pin.image[0].version}/${pin.image[0].id}`
+            }}
+            style={{
+              width: 200,
+              height: 200,
+              marginBottom: 10,
+              marginTop: 10,
+              marginLeft: 'auto',
+              marginRight: 'auto',
+            }}
+          />
+        }
+        <Text style={styles.txt}>{pin.txt}</Text>
+        <View
+          style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, marginBottom: 5 }}
+        >
+          <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => likePin(pin._id)}>
+            <Icon
+              name="heart"
+              color={pin.likes.includes(user) ? "red" : "#AAA"}
+              style={{ marginRight: 3 }}
+            />
+            <Text style={{ marginRight: 14 }}>{pin.likes ? pin.likes.length : 0}</Text>
+          </TouchableOpacity>
+          <Icon name="comment-o" style={{ marginRight: 3 }} />
+          <Text>{pin.comments.length}</Text>
+        </View>
+        <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
+          {pin.comments.map((comment, i) => (
+            <View style={styles.comment} key={i}>
+              <Image
+                source={{ uri: comment.pic }}
+                style={{ width: 20, height: 20, borderRadius: 10, marginRight: 3 }}
+              />
+              <Text>{comment.txt}</Text>
+            </View>
+          ))}
+          <TextInput
+            style={{ width : 220, fontSize: 14, height: 24, borderColor: '#CCC', borderWidth: 1, borderRadius: 8, paddingLeft: 5, paddingRight: 5 }}
+            placeholder=""
+            ref={input => { this.textInput = input }}
+            onSubmitEditing={(e) => this.onSubmitComment(e.nativeEvent.text)}
+          />
+        </View>
+      </ScrollView>
+    );
+  }
+}
 
 const styles = StyleSheet.create({
   callout: {
     width: '100%',
+    height: 320
   },
 
   title: {
@@ -180,5 +238,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'normal',
     width: 230,
+  },
+
+  comment: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8
   }
 });
