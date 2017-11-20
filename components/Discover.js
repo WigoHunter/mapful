@@ -165,7 +165,7 @@ class Callout extends React.Component {
               uri: `https://res.cloudinary.com/comp33302017/image/upload/v${pin.image[0].version}/${pin.image[0].id}`
             }}
             style={{
-              width: 200,
+              width: 220,
               height: 200,
               marginBottom: 10,
               marginTop: 10,
@@ -182,12 +182,12 @@ class Callout extends React.Component {
             <Icon
               name="heart"
               color={pin.likes.includes(user) ? "red" : "#AAA"}
-              style={{ marginRight: 3 }}
+              style={{ marginRight: 3, fontSize: 18}}
             />
-            <Text style={{ marginRight: 14 }}>{pin.likes ? pin.likes.length : 0}</Text>
+            <Text style={{ marginRight: 14, fontSize: 18 }}>{pin.likes ? pin.likes.length : 0}</Text>
           </TouchableOpacity>
-          <Icon name="comment-o" style={{ marginRight: 3 }} />
-          <Text>{pin.comments.length}</Text>
+          <Icon name="comment-o" style={{ marginRight: 3, fontSize: 18 }} />
+          <Text style={{ fontSize: 18 }}>{pin.comments.length}</Text>
         </View>
         <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
           {pin.comments.map((comment, i) => (
