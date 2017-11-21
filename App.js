@@ -9,6 +9,8 @@ import Discover from './components/Discover.js';
 import Profile from './components/Profile.js';
 import Pin from './components/Pin.js';
 
+import keys from './keys.json';
+
 const RootTabs = TabNavigator({
   Home: {
     screen: Home,

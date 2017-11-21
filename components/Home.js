@@ -3,6 +3,7 @@ import { StyleSheet, View, TouchableOpacity, ScrollView, Text, TextInput, Image 
 import { Header } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MapView from 'react-native-maps';
+import { LazyloadScrollView, LazyloadImage } from 'react-native-lazyload';
 
 const stitch = require("mongodb-stitch");
 const client = new stitch.StitchClient('mapful-cffdt');
@@ -55,10 +56,14 @@ export default class Home extends React.Component {
     const { pins } = this.state;
 
     return (
-      <ScrollView style={styles.home}>
+      <LazyloadScrollView
+        style={styles.home}
+        name="lazyload-scrollview"
+      >
         {pins.map(pin => (
           <Post
             key={pin._id}
+            host="lazyload-scrollview"
             pin={pin}
             likePin={this.likePin}
             user={this.props.screenProps.user}
@@ -66,7 +71,7 @@ export default class Home extends React.Component {
             userData={this.props.screenProps.userData}
           />
         ))}
-      </ScrollView>
+      </LazyloadScrollView>
     );
   }
 }
@@ -102,7 +107,7 @@ class Post extends React.Component {
   }
 
   render() {
-    const { pin, likePin, user, submitComment } = this.props;
+    const { host, pin, likePin, user, submitComment } = this.props;
     const { openComment } = this.state;
 
     return (
@@ -113,7 +118,8 @@ class Post extends React.Component {
           <Text style={styles.time}>{`${pin.time.getDate()} / ${pin.time.getMonth()} / ${pin.time.getFullYear()}`}</Text>
         </View>
         {(pin.image != null && pin.image.length > 0) &&
-          <Image
+          <LazyloadImage
+            host={host}
             source={{ uri: `https://res.cloudinary.com/comp33302017/image/upload/v${pin.image[0].version}/${pin.image[0].id}` }}
             style={styles.img}
             resizeMode="cover"
