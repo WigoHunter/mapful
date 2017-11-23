@@ -101,6 +101,7 @@ export default class Pin extends React.Component {
 			if(this.state.imgArr.length>=this.state.img.length){
 				clearInterval(tid);
 				console.log('start uploading data');
+				console.log(this.state.imgArr);
 				db.collection('Pins').insert({
 					username: this.props.screenProps.user,
 					txt:this.state.txt, 
@@ -118,8 +119,7 @@ export default class Pin extends React.Component {
 				return;
 			}
 			Alert.alert('place the pin successfully!');
-			{/*debug:print all the pins on the database*/}
-			db.collection('Pins').find({}).then(docs=>{console.log(docs)})
+			this.setState({imgArr:[],numImg:0,img:[],txt:'',title:''});
 			}
 				
 		}.bind(this) ,1000);
@@ -163,11 +163,11 @@ export default class Pin extends React.Component {
 			</View>
 			<View style={{flexDirection: 'row',marginTop:10}}>
 				<Text>Title: </Text>
-				<TextInput   style={{left: 20, width : 280, height: 30, borderColor: 'gray', borderWidth: 2}}  placeholder="" onChangeText={(title) => this.setState({title})}/>
+	<TextInput   style={{left: 20, width : 280, height: 30, borderColor: 'gray', borderWidth: 2}}  placeholder="" onChangeText={(title) => this.setState({title})} value = {this.state.title}/>
 			</View>
 			<View style={{flexDirection: 'row',marginTop:10}}>
 				<Text>Text: </Text>
-	<TextInput textAlignVertical='top' multiline={true} style={{left: 20, width : 280, height: 150, borderColor: 'gray', borderWidth: 2}}  placeholder="What are you thinking now?" onChangeText={(txt) => this.setState({txt})}/>
+	<TextInput textAlignVertical='top' multiline={true} style={{left: 20, width : 280, height: 150, borderColor: 'gray', borderWidth: 2}}  placeholder="What are you thinking now?" onChangeText={(txt) => this.setState({txt})} value = {this.state.txt}/>
 			</View>
 			<View style={{marginLeft:120,marginTop:30,width: 100, height: 80}} >
 				<Button style={{ top :150,left:100,width:10}} onPress={this._onPressPin.bind(this)}	title="Pin"/>
