@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import MapView from 'react-native-maps';
 import db from './utils/db.js';
 import { mapIdToProfilePicture } from './utils/utils.js';
+import DeferredImage from './DeferredRender.js';
 
 export default class Discover extends React.Component {
   static navigationOptions = {
@@ -184,12 +185,16 @@ class Callout extends React.Component {
         <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
           {pin.comments.map((comment, i) => (
             <View style={styles.comment} key={i}>
-              {/*mapIdToProfilePicture(comment.user).then((uri, err) => (
-                  <Image
-                    source={{ uri: uri }}
-                    style={{ width: 20, height: 20, borderRadius: 10, marginRight: 3 }}
-                  />
-                )).catch((e) => console.log(e))*/}
+              <DeferredImage
+                promise={mapIdToProfilePicture(comment.user)}
+                then={<View style={{ width: 20, height: 20 }} />}
+                style={{
+                  height: 20,
+                  width: 20,
+                  borderRadius: 10,
+                  marginRight: 3
+                }}
+              />
               <Text>{comment.txt}</Text>
             </View>
           ))}

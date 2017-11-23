@@ -6,6 +6,7 @@ import MapView from 'react-native-maps';
 import { LazyloadScrollView, LazyloadImage } from 'react-native-lazyload';
 import db from './utils/db.js';
 import { mapIdToProfilePicture } from './utils/utils.js';
+import DeferredImage from './DeferredRender.js';
 
 export default class Home extends React.Component {
 	static navigationOptions = {
@@ -158,7 +159,7 @@ class Post extends React.Component {
           <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
             {pin.comments.map((comment, i) => (
               <View style={styles.comment} key={i}>
-                <Deferred
+                <DeferredImage
                   promise={mapIdToProfilePicture(comment.user)}
                   then={<View style={{ width: 24, height: 24 }} />}
                   style={{
@@ -181,37 +182,6 @@ class Post extends React.Component {
         }
       </View>
     );
-  }
-}
-
-class Deferred extends React.Component {
-  constructor(props) {
-    super(props);
-
-    this.state = {
-      value: '',
-      done: false
-    }
-  }
-
-  componentDidMount() {
-    this.props.promise.then(value => {
-      this.setState({
-        value,
-        done: true,
-      });
-    });
-  }
-
-  render() {
-    const { value, done } = this.state;
-
-    return !done
-      ? this.props.then
-      : <Image
-          source={{ uri: this.state.value }}
-          style={this.props.style}
-        />
   }
 }
 
