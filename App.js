@@ -8,8 +8,7 @@ import Home from './components/Home.js';
 import Discover from './components/Discover.js';
 import Profile from './components/Profile.js';
 import Pin from './components/Pin.js';
-
-import keys from './keys.json';
+import db from './components/utils/db.js';
 
 const RootTabs = TabNavigator({
   Home: {
@@ -48,15 +47,6 @@ const RootTabs = TabNavigator({
   tabBarOptions: {
     activeTintColor: '#1EE494',
   },
-});
-
-const stitch = require("mongodb-stitch");
-const client = new stitch.StitchClient('mapful-cffdt');
-const db = client.service('mongodb', 'mongodb-atlas').db('Mapful');
-client.login().then(() =>
-  console.log("[MongoDB Stitch] Connected to Stitch")
-).catch(err => {
-  console.error(err)
 });
   
 export default class App extends React.Component {

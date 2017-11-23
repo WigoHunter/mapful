@@ -2,14 +2,9 @@ import React from 'react';
 import { StyleSheet, View, Text, Image } from 'react-native';
 import { Header, Icon } from 'react-native-elements';
 import MapView from 'react-native-maps';
-
-const stitch = require("mongodb-stitch")
-const client = new stitch.StitchClient('mapful-cffdt');
-const db = client.service('mongodb', 'mongodb-atlas').db('Mapful');
+import db from './utils/db.js';
 var CryptoJS = require('crypto-js');
-client.login().catch(err => {
-  console.error(err)
-});
+
 const styles = StyleSheet.create({
     profilePicture: {
         alignSelf: 'center',
@@ -64,8 +59,7 @@ export default class Profile extends React.Component {
 			this.state={pic : 'http://res.cloudinary.com/comp33302017/image/upload/v1510979878/213810-200_b0flgc.png'};
 		}else{
 			this.state={pic :  `https://res.cloudinary.com/comp33302017/image/upload/v${this.props.screenProps.userData.pic.version}/${this.props.screenProps.userData.pic.id}`};
-		}console.log(this.state.pic);
-		
+		}
     }
 	
 	uploadImage(uri) {

@@ -3,16 +3,8 @@ import { Alert, StyleSheet, TouchableOpacity, View, ScrollView, Text, Image, Tex
 import { Header } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MapView from 'react-native-maps';
-
-const stitch = require("mongodb-stitch");
-const client = new stitch.StitchClient('mapful-cffdt');
-const db = client.service('mongodb', 'mongodb-atlas').db('Mapful');
-
-client.login().then(() =>
-  console.log("[MongoDB Stitch] Connected to Stitch")
-).catch(err => {
-  console.error(err)
-});
+import db from './utils/db.js';
+import { mapIdToProfilePicture } from './utils/utils.js';
 
 export default class Discover extends React.Component {
   static navigationOptions = {
@@ -141,7 +133,7 @@ class Callout extends React.Component {
         { _id: this.props.pin._id },
         { $push: { 'comments': {
             txt,
-            pic: `https://res.cloudinary.com/comp33302017/image/upload/v${this.props.userData.pic.version}/${this.props.userData.pic.id}`
+            user: this.props.user,
           }
         }}
       )
@@ -192,10 +184,12 @@ class Callout extends React.Component {
         <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
           {pin.comments.map((comment, i) => (
             <View style={styles.comment} key={i}>
-              <Image
-                source={{ uri: comment.pic }}
-                style={{ width: 20, height: 20, borderRadius: 10, marginRight: 3 }}
-              />
+              {/*mapIdToProfilePicture(comment.user).then((uri, err) => (
+                  <Image
+                    source={{ uri: uri }}
+                    style={{ width: 20, height: 20, borderRadius: 10, marginRight: 3 }}
+                  />
+                )).catch((e) => console.log(e))*/}
               <Text>{comment.txt}</Text>
             </View>
           ))}

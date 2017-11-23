@@ -3,30 +3,30 @@ import { StyleSheet, Button, View, TextInput, ScrollView, Text, Alert, Image } f
 import { Header, Icon } from 'react-native-elements';
 import MapView from 'react-native-maps';
 import TimerMixin from 'react-timer-mixin';
+import db from './utils/db.js';
 
-const stitch = require("mongodb-stitch")
-const client = new stitch.StitchClient('mapful-cffdt');
-const db = client.service('mongodb', 'mongodb-atlas').db('Mapful');
-client.login().then(() =>
-  console.log("[MongoDB Stitch] Connected to Stitch")
-).catch(err => {
-  console.error(err)
-});
-	var CryptoJS = require('crypto-js');
+var CryptoJS = require('crypto-js');
 export default class Pin extends React.Component {
 	static navigationOptions = {
-    tabBarLabel: 'Pin'
-  };
+		tabBarLabel: 'Pin'
+	};
 	constructor(props) {
 		super(props);
-		this.state = {location: {
-												latitude:0,
-												longitude:0
-												},
-									txt:'',title:'',numImg:0,img:[],map:false,imgArr:[]};
+		this.state = {
+			location: {
+				latitude:0,
+				longitude:0
+			},
+			txt:'',
+			title:'',
+			numImg:0,
+			img:[],
+			map:false,
+			imgArr:[]
+		};
+		
 		this._onPressCurrentLocation();
 	}
-	
 
 	uploadImage(uri) {
 		  let timestamp = (Date.now() / 1000 | 0).toString();

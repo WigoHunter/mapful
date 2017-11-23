@@ -1,19 +1,11 @@
 import React from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView, Text, TextInput, Image } from 'react-native';
+import { Alert, StyleSheet, View, TouchableOpacity, ScrollView, Text, TextInput, Image } from 'react-native';
 import { Header } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MapView from 'react-native-maps';
 import { LazyloadScrollView, LazyloadImage } from 'react-native-lazyload';
-
-const stitch = require("mongodb-stitch");
-const client = new stitch.StitchClient('mapful-cffdt');
-const db = client.service('mongodb', 'mongodb-atlas').db('Mapful');
-
-client.login().then(() =>
-  console.log("[MongoDB Stitch] Connected to Stitch")
-).catch(err => {
-  console.error(err)
-});
+import db from './utils/db.js';
+import { mapIdToProfilePicture } from './utils/utils.js';
 
 export default class Home extends React.Component {
 	static navigationOptions = {
@@ -93,17 +85,35 @@ class Post extends React.Component {
   }
 
   onSubmitComment(txt) {
+    Alert.alert(this.props.user);
+
     db.collection('Pins')
       .updateOne(
         { _id: this.props.pin._id },
         { $push: { 'comments': {
             txt,
-            pic: `https://res.cloudinary.com/comp33302017/image/upload/v${this.props.userData.pic.version}/${this.props.userData.pic.id}`
+            user: this.props.user,
           }
         }}
       )
       .then(() => this.props.updatePins())
       .then(() => this.textInput.clear());
+  }
+
+  destoryPins() {
+    db.collection('Pins')
+      .deleteMany({})
+      .then(() => {
+        this.props.updatePins();
+      });
+  }
+
+  destoryUsers() {
+    db.collection('User')
+      .deleteMany({})
+      .then(() => {
+        this.props.updatePins();
+      });
   }
 
   render() {
@@ -112,7 +122,7 @@ class Post extends React.Component {
 
     return (
       <View style={styles.pin}>
-        <Text style={styles.title}>{pin.title}</Text>
+        <Text style={styles.title} onPress={() => this.destoryPins()}>{pin.title}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={styles.username}>{pin.username}</Text>
           <Text style={styles.time}>{`${pin.time.getDate()} / ${pin.time.getMonth()} / ${pin.time.getFullYear()}`}</Text>
@@ -126,7 +136,7 @@ class Post extends React.Component {
           />
         }
 
-        <Text style={styles.txt}>{pin.txt}</Text>
+        <Text style={styles.txt} onPress={() => this.destoryUsers()}>{pin.txt}</Text>
         <View
           style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, marginBottom: 5 }}
         >
@@ -148,9 +158,15 @@ class Post extends React.Component {
           <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
             {pin.comments.map((comment, i) => (
               <View style={styles.comment} key={i}>
-                <Image
-                  source={{ uri: comment.pic }}
-                  style={{ width: 24, height: 24, borderRadius: 12, marginRight: 6 }}
+                <Deferred
+                  promise={mapIdToProfilePicture(comment.user)}
+                  then={<View style={{ width: 24, height: 24 }} />}
+                  style={{
+                    height: 24,
+                    width: 24,
+                    borderRadius: 12,
+                    marginRight: 6
+                  }}
                 />
                 <Text style={styles.commentText}>{comment.txt}</Text>
               </View>
@@ -165,6 +181,37 @@ class Post extends React.Component {
         }
       </View>
     );
+  }
+}
+
+class Deferred extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      value: '',
+      done: false
+    }
+  }
+
+  componentDidMount() {
+    this.props.promise.then(value => {
+      this.setState({
+        value,
+        done: true,
+      });
+    });
+  }
+
+  render() {
+    const { value, done } = this.state;
+
+    return !done
+      ? this.props.then
+      : <Image
+          source={{ uri: this.state.value }}
+          style={this.props.style}
+        />
   }
 }
 
