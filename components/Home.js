@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, StyleSheet, View, TouchableOpacity, ScrollView, Text, TextInput, Image } from 'react-native';
+import { Alert, StyleSheet, View, TouchableOpacity, ScrollView, Text, TextInput, Image, RefreshControl } from 'react-native';
 import { Header } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MapView from 'react-native-maps';
@@ -17,15 +17,25 @@ export default class Home extends React.Component {
     super(props);
 
     this.state = {
-      pins: []
+      pins: [],
+      refreshing: false
     };
 
     this.updatePins = this.updatePins.bind(this);
     this.likePin = this.likePin.bind(this);
+    this.onRefresh = this.onRefresh.bind(this);
   }
 
   componentWillMount() {
     this.updatePins();
+  }
+
+  onRefresh() {
+    this.setState({ refreshing: true });
+    this.updatePinsWithPromise()
+      .then(() => {
+        this.setState({ refreshing: false });
+      });
   }
 
   // Same as updatePins() -> Should probably use Redux store for pins
@@ -36,13 +46,39 @@ export default class Home extends React.Component {
       .then(pins => this.setState({ pins: pins.reverse() }));
   }
 
+  updatePinsWithPromise() {
+    const self = this;
+
+    return new Promise((resolve, reject) => {
+      db.collection('Pins')
+        .find({})
+        .then(pins => {
+          self.setState({ pins: pins.reverse() });
+          resolve("success");
+        });
+    })
+  }
+
   likePin(id) {
     db.collection('Pins')
-      .updateOne(
-        { _id: id },
-        { $addToSet: { 'likes': this.props.screenProps.user } }
-      )
-      .then(() => this.updatePins());
+      .find({ _id: id })
+      .then(docs => {
+        docs[0].likes.includes(this.props.screenProps.user)
+          ? 
+            db.collection('Pins')
+              .updateOne(
+                { _id: id },
+                { $pull: { 'likes': this.props.screenProps.user } }
+              )
+              .then(() => this.updatePins())
+          :
+            db.collection('Pins')
+              .updateOne(
+                { _id: id },
+                { $addToSet: { 'likes': this.props.screenProps.user } }
+              )
+              .then(() => this.updatePins())
+      });
   }
 
   render() {
@@ -52,6 +88,12 @@ export default class Home extends React.Component {
       <LazyloadScrollView
         style={styles.home}
         name="lazyload-scrollview"
+        refreshControl={
+          <RefreshControl
+            refreshing={this.state.refreshing}
+            onRefresh={this.onRefresh}
+          />
+        }
       >
         {pins.map(pin => (
           <Post
@@ -86,8 +128,6 @@ class Post extends React.Component {
   }
 
   onSubmitComment(txt) {
-    Alert.alert(this.props.user);
-
     db.collection('Pins')
       .updateOne(
         { _id: this.props.pin._id },
@@ -145,13 +185,13 @@ class Post extends React.Component {
             <Icon
               name="heart"
               color={pin.likes.includes(user) ? "red" : "#AAA"}
-              style={{ marginRight: 3 }}
+              style={{ marginRight: 3, fontSize: 14 }}
             />
-            <Text style={{ marginRight: 14 }}>{pin.likes ? pin.likes.length : 0}</Text>
+            <Text style={{ marginRight: 14, fontSize: 14 }}>{pin.likes ? pin.likes.length : 0}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => this.toggleComment()}>
-            <Icon name="comment-o" style={{ marginRight: 3 }} />
-            <Text>{pin.comments.length}</Text>
+            <Icon name="comment-o" style={{ marginRight: 3, fontSize: 14 }} />
+            <Text style={{ fontSize: 14 }}>{pin.comments.length}</Text>
           </TouchableOpacity>
         </View>
 

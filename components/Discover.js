@@ -6,6 +6,7 @@ import MapView from 'react-native-maps';
 import db from './utils/db.js';
 import { mapIdToProfilePicture } from './utils/utils.js';
 import DeferredImage from './DeferredRender.js';
+import Marker from './Marker.js';
 
 export default class Discover extends React.Component {
   static navigationOptions = {
@@ -110,6 +111,7 @@ export default class Discover extends React.Component {
                 longitude: pin.location.longitude
               }}
             >
+              <Marker />
               <MapView.Callout style={{ zIndex: 10000 }}>
                 <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} />
               </MapView.Callout>
@@ -175,12 +177,12 @@ class Callout extends React.Component {
             <Icon
               name="heart"
               color={pin.likes.includes(user) ? "red" : "#AAA"}
-              style={{ marginRight: 3 }}
+              style={{ marginRight: 3, fontSize: 14 }}
             />
-            <Text style={{ marginRight: 14 }}>{pin.likes ? pin.likes.length : 0}</Text>
+            <Text style={{ marginRight: 14, fontSize: 14 }}>{pin.likes ? pin.likes.length : 0}</Text>
           </TouchableOpacity>
-          <Icon name="comment-o" style={{ marginRight: 3 }} />
-          <Text>{pin.comments.length}</Text>
+          <Icon name="comment-o" style={{ marginRight: 3, fontSize: 14 }} />
+          <Text style={{ fontSize: 14 }}>{pin.comments.length}</Text>
         </View>
         <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
           {pin.comments.map((comment, i) => (
