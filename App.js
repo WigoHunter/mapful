@@ -147,9 +147,17 @@ export default class App extends React.Component {
         <View  style={{ justifyContent: 'center', flex:1}}>
           <Header
               outerContainerStyles={{ position: 'relative', top: 0 }}
-              innerContainerStyles={{ position: 'relative', top: 0 }}
-              leftComponent={{ icon: 'menu', color: '#FFF' }}
-              centerComponent={{ text: '', style: { fontSize: 16, color: '#FFF' } }}
+              innerContainerStyles={{ position: 'relative', top: 0, alignItems: 'center', justifyContent: 'center' }}
+              centerComponent={
+                <Image
+                  source={require('./img/mapful-logo.png')}
+                  style={{
+                    width: 100,
+                    height: 40,
+                    marginTop: 10
+                  }}
+                />
+              }
               backgroundColor="#1EE494"
           />
           <RootTabs screenProps={{user: this.state.username,userData:this.state.userData,callback:this.update.bind(this)}} />
