@@ -64,11 +64,24 @@ export default class Discover extends React.Component {
   
   likePin(id) {
     db.collection('Pins')
-      .updateOne(
-        { _id: id },
-        { $addToSet: { 'likes': this.props.screenProps.user } }
-      )
-      .then(() => this.updatePins());
+      .find({ _id: id })
+      .then(docs => {
+        docs[0].likes.includes(this.props.screenProps.user)
+          ? 
+            db.collection('Pins')
+              .updateOne(
+                { _id: id },
+                { $pull: { 'likes': this.props.screenProps.user } }
+              )
+              .then(() => this.updatePins())
+          :
+            db.collection('Pins')
+              .updateOne(
+                { _id: id },
+                { $addToSet: { 'likes': this.props.screenProps.user } }
+              )
+              .then(() => this.updatePins())
+      });
   }
 
   render() {
