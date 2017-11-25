@@ -89,8 +89,6 @@ export default class Discover extends React.Component {
         </View>
         <MapMarkerClustering
           style={{ flex: 1 }}
-          region={region}
-          onRegionChangeComplete={this.OnRegionChange}
         >
           {pins.map(pin =>
             <MapView.Marker

@@ -18,6 +18,7 @@ const Marker = () => (
         transform: [{ rotate: '45deg'}],
         alignItems: 'center',
         justifyContent: 'center',
+        zIndex: 1
       }}
     >
       <View
@@ -130,19 +131,20 @@ export default class CustomMarker extends Component {
             isCluster = 1;
 			textForCluster
             if(this.props.customClusterMarkerDesign && typeof this.props.customClusterMarkerDesign === "object"){
-                htmlElement = <View style = {{width: markerWidth, height: markerHeight, justifyContent: 'center', alignItems: 'center'}}>
-                    <Text style = {{width: markerWidth, textAlign: 'center', position:'absolute',
-                        fontSize: textSize, backgroundColor: 'transparent', color: this.state.clusterTextColor, fontWeight: 'bold'}}
-                          children = {textForCluster}/>
-                    {this.props.customClusterMarkerDesign}
-                </View>;
+                htmlElement = (
+                    <View style = {{width: markerWidth, height: markerHeight, justifyContent: 'center', alignItems: 'center', zIndex: 1 }}>
+                        <Text style = {{width: markerWidth, textAlign: 'center',
+                            fontSize: textSize, backgroundColor: 'transparent', color: this.state.clusterTextColor, fontWeight: 'bold', zIndex: 1 }}
+                            children = {textForCluster}/>
+                        {this.props.customClusterMarkerDesign}
+                    </View>);
             }else{
                 htmlElement = (
                     <View style = {{ borderRadius: markerWidth, position: 'relative', backgroundColor: this.state.clusterColor, width: markerWidth, height: markerHeight,
-                        borderWidth: this.state.clusterBorderWidth, borderColor: this.state.clusterBorderColor, justifyContent: 'center', alignItems: 'center'}}>
+                        borderWidth: this.state.clusterBorderWidth, borderColor: this.state.clusterBorderColor, justifyContent: 'center', alignItems: 'center', zIndex: 1 }}>
                         <Text
                             style = {{width: markerWidth, textAlign: 'center',
-                                fontSize: textSize, backgroundColor: 'transparent', color: this.state.clusterTextColor, fontWeight: 'bold'}}>
+                                fontSize: textSize, backgroundColor: 'transparent', color: this.state.clusterTextColor, fontWeight: 'bold', zIndex: 1 }}>
                             {textForCluster}
 							</Text>
                     </View>);
@@ -175,12 +177,12 @@ export default class CustomMarker extends Component {
                         key = {isCluster}
                         {...this.state.props}
                         title={null}
-                        style={{ zIndex: 100 }}
+                        style={{ zIndex: 1 }}
                         >
                         {htmlElement}
-					  <MapView.Callout style={{ zIndex: 10000 }}>
+					  <MapView.Callout style={{ zIndex: 10 }}>
 						<ScrollView style={{width: '100%',
-						height: 320}}>
+						height: 320, zIndex: 10}}>
 								{arrayCallouts}
 						</ScrollView>
 					  </MapView.Callout>
@@ -191,7 +193,7 @@ export default class CustomMarker extends Component {
             return(
                 <MapView.Marker
                     key = {isCluster}
-                    style={{ zIndex: 100 }}                    
+                    style={{ zIndex: 1 }}                    
                     {...this.state.props}>
 						<Marker />
 						{htmlElement}
@@ -199,22 +201,4 @@ export default class CustomMarker extends Component {
             );
         }
     }
-}
-
-
-class CalloutList extends Component {
-  constructor(props) {
-    super(props);
-	this.state={}
-  }
-
-  render() {
-    
-    return (
-      <ScrollView>
-	  
-	  
-      </ScrollView>
-		)
-  }
 }
