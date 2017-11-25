@@ -3,6 +3,7 @@ import { Alert, StyleSheet, TouchableOpacity, View, ScrollView, Text, Image, Tex
 import { Header } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MapView from 'react-native-maps';
+import MapMarkerClustering  from './MapMarkerClustering'
 import db from './utils/db.js';
 import { mapIdToProfilePicture } from './utils/utils.js';
 import DeferredImage from './DeferredRender.js';
@@ -110,7 +111,7 @@ export default class Discover extends React.Component {
             Update
           </Text>
         </View>
-        <MapView
+        <MapMarkerClustering
           style={{ flex: 1 }}
           region={region}
           showsCompass={false}
@@ -124,13 +125,14 @@ export default class Discover extends React.Component {
                 longitude: pin.location.longitude
               }}
             >
-              <Marker />
               <MapView.Callout style={{ zIndex: 10000 }}>
-                <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} />
+				<ScrollView style={styles.callout}>
+					<Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} />
+				</ScrollView>
               </MapView.Callout>
             </MapView.Marker>
           )}
-        </MapView>
+        </MapMarkerClustering>
       </View>
     );
   }
@@ -161,7 +163,7 @@ class Callout extends React.Component {
     const { pin, updatePins, likePin, user } = this.props;
     
     return (
-      <ScrollView style={styles.callout}>
+      <View>
         <Text style={styles.title}>{pin.title}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={styles.username}>{pin.username}</Text>
@@ -220,7 +222,7 @@ class Callout extends React.Component {
             onSubmitEditing={(e) => this.onSubmitComment(e.nativeEvent.text)}
           />
         </View>
-      </ScrollView>
+      </View>
     );
   }
 }
