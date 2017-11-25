@@ -22,18 +22,25 @@ export default class MapMarkerClustering extends Component {
             clusterBorderWidth: 0,
             numberOfMarkers: 0,
             initDelta: 0,
-            region: props.region,
+            region: {
+                latitude: 32.282462956240902,
+                longitude: 114.1280245223424,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421
+            },
             markers: new Set(),
             markersOnMap: [],
             otherChildren: [],
             mapProps: null,
         };
+
+        this.onRegionChangeComplete = this.onRegionChangeComplete.bind(this);
     }
 
     createMarkers(propsData) {
         this.state.markers.clear();
         this.state.mapProps = propsData;
-        this.state.initDelta = propsData.region.latitudeDelta;
+        this.state.initDelta = this.state.region.latitudeDelta;
         this.state.numberOfMarkers = 0;
         this.state.otherChildren = [];
 
@@ -60,10 +67,10 @@ export default class MapMarkerClustering extends Component {
                   propsData.children.map((item) => {
                     if(item) {
                       if (item.length === 0 || item.length === undefined) {
-                          newArray.push(item);
+                          newArray.unshift(item);
                       } else {
                           item.map((child) => {
-                              newArray.push(child);
+                              newArray.unshift(child);
                           });
                       }
                     }
@@ -81,7 +88,7 @@ export default class MapMarkerClustering extends Component {
                         });
                         markerKey++;
                     } else {
-                        this.state.otherChildren.push(item);
+                        this.state.otherChildren.unshift(item);
                     }
                 });
             }
@@ -95,11 +102,28 @@ export default class MapMarkerClustering extends Component {
     }
 
     componentWillMount() {
+        const Options = {
+            enableHighAccuracy: false,
+            timeout: 1000,
+            maximumAge: 0
+        };
+
+        navigator.geolocation.getCurrentPosition(pos => {
+            this.setState({
+                region: {
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421
+                }
+            });
+        }, Options);
+
         this.createMarkers(this.props);
     }
 
     onRegionChangeComplete(region) {
-        this.state.region = region;
+        this.setState({ region });
         if (this.state.numberOfMarkers > 1 && this.state.enableClustering) {
             if (region.latitudeDelta - this.state.initDelta > this.state.initDelta / divideBy) {
                 this.state.initDelta = region.latitudeDelta;
@@ -150,7 +174,7 @@ export default class MapMarkerClustering extends Component {
             } else {
                 this.state.markersOnMap = [];
                 this.state.markers.forEach((marker) => {
-                    this.state.markersOnMap.push(<ClusteredMarker clusterColor={this.state.clusterColor} {...marker}
+                    this.state.markersOnMap.unshift(<ClusteredMarker clusterColor={this.state.clusterColor} {...marker}
                                                                clusterTextColor={this.state.clusterTextColor}
                                                                clusterBorderColor={this.state.clusterBorderColor}
                                                                clusterBorderWidth={this.state.clusterBorderWidth}
@@ -163,7 +187,7 @@ export default class MapMarkerClustering extends Component {
         } else {
             this.state.markersOnMap = [];
             this.state.markers.forEach((marker) => {
-                this.state.markersOnMap.push(<ClusteredMarker {...marker}>{marker.props.children}</ClusteredMarker>);
+                this.state.markersOnMap.unshift(<ClusteredMarker {...marker}>{marker.props.children}</ClusteredMarker>);
             });
         }
         this.setState({ markersOnMap: this.state.markersOnMap });

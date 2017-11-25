@@ -17,12 +17,6 @@ export default class Discover extends React.Component {
     super(props);
 
     this.state = {
-      region: {
-        latitude: 32.282462956240902,
-        longitude: 114.1280245223424,
-        latitudeDelta: 0.0922,
-        longitudeDelta: 0.0421,
-      },
       pins: []
     };
 
@@ -32,23 +26,6 @@ export default class Discover extends React.Component {
   }
 
   componentDidMount() {
-    const Options = {
-      enableHighAccuracy: false,
-      timeout: 1000,
-      maximumAge: 0
-    };
-
-    navigator.geolocation.getCurrentPosition(pos => {
-      this.setState({
-        region: {
-          latitude: pos.coords.latitude,
-          longitude: pos.coords.longitude,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 0.0421
-        }
-      });
-    }, Options);
-    
     this.updatePins();
   }
 

@@ -175,6 +175,7 @@ export default class CustomMarker extends Component {
                         key = {isCluster}
                         {...this.state.props}
                         title={null}
+                        style={{ zIndex: 100 }}
                         >
                         {htmlElement}
 					  <MapView.Callout style={{ zIndex: 10000 }}>
@@ -190,6 +191,7 @@ export default class CustomMarker extends Component {
             return(
                 <MapView.Marker
                     key = {isCluster}
+                    style={{ zIndex: 100 }}                    
                     {...this.state.props}>
 						<Marker />
 						{htmlElement}
