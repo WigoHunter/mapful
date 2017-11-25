@@ -7,7 +7,6 @@ import MapMarkerClustering  from './MapMarkerClustering'
 import db from './utils/db.js';
 import { mapIdToProfilePicture } from './utils/utils.js';
 import DeferredImage from './DeferredRender.js';
-import Marker from './Marker.js';
 
 export default class Discover extends React.Component {
   static navigationOptions = {
@@ -32,7 +31,7 @@ export default class Discover extends React.Component {
     this.likePin = this.likePin.bind(this);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     const Options = {
       enableHighAccuracy: false,
       timeout: 1000,
@@ -114,8 +113,7 @@ export default class Discover extends React.Component {
         <MapMarkerClustering
           style={{ flex: 1 }}
           region={region}
-          showsCompass={false}
-          onRegionChangeComplete={(r) => this.OnRegionChange(r)}
+          onRegionChangeComplete={this.OnRegionChange}
         >
           {pins.map(pin =>
             <MapView.Marker
@@ -125,10 +123,10 @@ export default class Discover extends React.Component {
                 longitude: pin.location.longitude
               }}
             >
-              <MapView.Callout style={{ zIndex: 10000 }}>
-				<ScrollView style={styles.callout}>
-					<Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} />
-				</ScrollView>
+              <MapView.Callout style={{ zIndex: 100000 }}>
+                <ScrollView style={styles.callout}>
+                  <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} />
+                </ScrollView>
               </MapView.Callout>
             </MapView.Marker>
           )}
@@ -142,7 +140,12 @@ class Callout extends React.Component {
   constructor(props) {
     super(props);
 
+    this.state = {
+      openComment: false
+    }
+
     this.onSubmitComment = this.onSubmitComment.bind(this);
+    this.toggleComment = this.toggleComment.bind(this);
   }
 
   onSubmitComment(txt) {
@@ -159,11 +162,15 @@ class Callout extends React.Component {
       .then(() => this.textInput.clear());
   }
 
+  toggleComment() {
+    this.setState({ openComment: !this.state.openComment });
+  }
+
   render() {
     const { pin, updatePins, likePin, user } = this.props;
     
     return (
-      <View>
+      <View style={{ marginTop: 5, marginBottom: 5 }}>
         <Text style={styles.title}>{pin.title}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={styles.username}>{pin.username}</Text>
@@ -196,32 +203,36 @@ class Callout extends React.Component {
             />
             <Text style={{ marginRight: 14, fontSize: 14 }}>{pin.likes ? pin.likes.length : 0}</Text>
           </TouchableOpacity>
-          <Icon name="comment-o" style={{ marginRight: 3, fontSize: 14 }} />
-          <Text style={{ fontSize: 14 }}>{pin.comments.length}</Text>
+          <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => this.toggleComment()}>
+            <Icon name="comment-o" style={{ marginRight: 3, fontSize: 14 }} />
+            <Text style={{ fontSize: 14 }}>{pin.comments.length}</Text>
+          </TouchableOpacity>
         </View>
-        <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
-          {pin.comments.map((comment, i) => (
-            <View style={styles.comment} key={i}>
-              <DeferredImage
-                promise={mapIdToProfilePicture(comment.user)}
-                then={<View style={{ width: 20, height: 20 }} />}
-                style={{
-                  height: 20,
-                  width: 20,
-                  borderRadius: 10,
-                  marginRight: 3
-                }}
-              />
-              <Text>{comment.txt}</Text>
-            </View>
-          ))}
-          <TextInput
-            style={{ width : 220, fontSize: 14, height: 24, borderColor: '#CCC', borderWidth: 1, borderRadius: 8, paddingLeft: 5, paddingRight: 5 }}
-            placeholder=""
-            ref={input => { this.textInput = input }}
-            onSubmitEditing={(e) => this.onSubmitComment(e.nativeEvent.text)}
-          />
-        </View>
+        {this.state.openComment &&
+          <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
+            {pin.comments.map((comment, i) => (
+              <View style={styles.comment} key={i}>
+                <DeferredImage
+                  promise={mapIdToProfilePicture(comment.user)}
+                  then={<View style={{ width: 20, height: 20 }} />}
+                  style={{
+                    height: 20,
+                    width: 20,
+                    borderRadius: 10,
+                    marginRight: 3
+                  }}
+                />
+                <Text>{comment.txt}</Text>
+              </View>
+            ))}
+            <TextInput
+              style={{ width : 220, fontSize: 14, height: 24, borderColor: '#CCC', borderWidth: 1, borderRadius: 8, paddingLeft: 5, paddingRight: 5 }}
+              placeholder=""
+              ref={input => { this.textInput = input }}
+              onSubmitEditing={(e) => this.onSubmitComment(e.nativeEvent.text)}
+            />
+          </View>
+        }
       </View>
     );
   }
@@ -230,7 +241,8 @@ class Callout extends React.Component {
 const styles = StyleSheet.create({
   callout: {
     width: '100%',
-    height: 320
+    height: 320,
+    zIndex: 100000
   },
 
   title: {

@@ -185,6 +185,7 @@ export default class MapMarkerClustering extends Component {
         return (
             <MapView {...this.state.mapProps}
                      region={this.state.region}
+                     showsCompass={false}
                      ref={(ref) => this._root = ref}
                      onRegionChangeComplete={(region) => {
                          this.onRegionChangeComplete(region);

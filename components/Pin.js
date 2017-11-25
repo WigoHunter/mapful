@@ -4,7 +4,6 @@ import { Header, Icon } from 'react-native-elements';
 import MapView from 'react-native-maps';
 import TimerMixin from 'react-timer-mixin';
 import db from './utils/db.js';
-import Marker from './Marker.js';
 
 var CryptoJS = require('crypto-js');
 export default class Pin extends React.Component {
