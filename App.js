@@ -9,6 +9,7 @@ import Discover from './components/Discover.js';
 import Profile from './components/Profile.js';
 import Pin from './components/Pin.js';
 import db from './components/utils/db.js';
+import NowLoading from './components/NowLoading.js';
 
 const RootTabs = TabNavigator({
   Home: {
@@ -50,25 +51,29 @@ const RootTabs = TabNavigator({
 });
   
 export default class App extends React.Component {
-	constructor(props) {
+  constructor(props) {
 		super(props);
 		this.state = {
-      username: '',
-      pass: '',
-      id: 0,
-      isLoggedIn: false
-    };
+		  username: '',
+		  pass: '',
+		  id: 0,
+		  isLoggedIn: false,
+		  loading: false
+		};
   }
   update() {
 	  console.log('receivecallback');
-    db.collection('User')
+	db.collection('User')
       .find({ username: this.state.username, pass: this.state.pass })
       .then(docs => {(this.setState({userData:docs[0].profile}))})
   }
 	_onPressLogin() {
+	this.setState({loading:true});
     db.collection('User')
       .find({ username: this.state.username, pass: this.state.pass })
-      .then(docs => { docs.length
+      .then(docs => {
+		  this.setState({loading:false});
+		  docs.length
         ? (this.setState({isLoggedIn:true,userData:docs[0].profile}))
         : (Alert.alert('Incorrect username/password!'))
       })
@@ -80,6 +85,7 @@ export default class App extends React.Component {
       : (this.state.pass == ''
           ? (Alert.alert('Password cannot be empty.'))
           : (
+			this.setState({loading:true}),
             db.collection('User')
               .find({ username:this.state.username })
               .then(docs => docs.length
@@ -108,10 +114,13 @@ export default class App extends React.Component {
   
   render() {
     const { isLoggedIn } = this.state;
+    const { loading } = this.state;
 
 	  if(!this.state.isLoggedIn){
 		  return (
+		  
         <View style={{ backgroundColor: '#1EE494', flex: 1 }}>
+			{loading && <NowLoading/>}
           <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <Image
               source={require('./img/mapful.png')}
