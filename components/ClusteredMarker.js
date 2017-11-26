@@ -31,7 +31,8 @@ const Marker = () => (
       >
       </View>
     </View>
-  );
+);
+
 export default class CustomMarker extends Component {
     constructor(props){
         super(props);
@@ -56,41 +57,27 @@ export default class CustomMarker extends Component {
          }*/
         return(true);
     }
+
 	dig(child, array){
 		if(child.props.belly!=null){
 			child.props.belly.forEach((childMarker)=>{
-					console.log('add1');
-					array.push(childMarker.props.children.props.children.props.children);
-					this.dig(childMarker,array);
+                console.log('add1');
+                array.push(childMarker.props.children.props.children.props.children);
+                this.dig(childMarker,array);
 			})
 		}
 		if(child.belly!=null){
 			child.belly.forEach((childMarker)=>{
-					console.log('add1');
-					array.push(childMarker.props.children.props.children.props.children);
-					this.dig(childMarker,array);
+                console.log('add1');
+                array.push(childMarker.props.children.props.children.props.children);
+                this.dig(childMarker,array);
 			})
 		}
-	}
+    }
+    
     render(){
-
         this.state.value = this.props.value;
         this.state.props = this.props.props;
-
-        this.state.clusterColor = this.props.clusterColor;
-        this.state.clusterTextColor = this.props.clusterTextColor;
-        this.state.clusterBorderColor = this.props.clusterBorderColor;
-        this.state.clusterBorderWidth = this.props.clusterBorderWidth;
-
-        if( this.state.clusterColor === undefined || this.state.clusterColor == ''){
-            this.state.clusterColor = '#F5F5F5';
-        }if( this.state.clusterTextColor === undefined || this.state.clusterTextColor == ''){
-            this.state.clusterTextColor = '#FF5252';
-        }if( this.state.clusterBorderColor === undefined || this.state.clusterBorderColor == ''){
-            this.state.clusterBorderColor = '#FF5252';
-        }if( this.state.clusterBorderWidth === undefined || this.state.clusterBorderWidth == ''){
-            this.state.clusterBorderWidth = 1;
-        }
 
         let textForCluster = '';
         let markerWidth, markerHeight, textSize;
@@ -130,15 +117,16 @@ export default class CustomMarker extends Component {
         if(textForCluster !== ''){
             isCluster = 1;
 			textForCluster
-            if(this.props.customClusterMarkerDesign && typeof this.props.customClusterMarkerDesign === "object"){
+            if (this.props.customClusterMarkerDesign && typeof this.props.customClusterMarkerDesign === "object"){
                 htmlElement = (
                     <View style = {{width: markerWidth, height: markerHeight, justifyContent: 'center', alignItems: 'center', zIndex: 1 }}>
                         <Text style = {{width: markerWidth, textAlign: 'center',
                             fontSize: textSize, backgroundColor: 'transparent', color: this.state.clusterTextColor, fontWeight: 'bold', zIndex: 1 }}
                             children = {textForCluster}/>
                         {this.props.customClusterMarkerDesign}
-                    </View>);
-            }else{
+                    </View>
+                );
+            } else {
                 htmlElement = (
                     <View style = {{ borderRadius: markerWidth, position: 'relative', backgroundColor: this.state.clusterColor, width: markerWidth, height: markerHeight,
                         borderWidth: this.state.clusterBorderWidth, borderColor: this.state.clusterBorderColor, justifyContent: 'center', alignItems: 'center', zIndex: 1 }}>
@@ -147,13 +135,15 @@ export default class CustomMarker extends Component {
                                 fontSize: textSize, backgroundColor: 'transparent', color: this.state.clusterTextColor, fontWeight: 'bold', zIndex: 1 }}>
                             {textForCluster}
 							</Text>
-                    </View>);
+                    </View>
+                );
             }
-        }else{
+        } else {
             isCluster = 0;
-            if(this.props.children !== undefined){
+
+            if (this.props.children !== undefined) {
                 htmlElement = this.props.children;
-            }else{
+            } else {
                 htmlElement = (null);
             }
         }
@@ -194,9 +184,10 @@ export default class CustomMarker extends Component {
                 <MapView.Marker
                     key = {isCluster}
                     style={{ zIndex: 1 }}                    
-                    {...this.state.props}>
-						<Marker />
-						{htmlElement}
+                    {...this.state.props}
+                >
+                    <Marker />
+                    {htmlElement}
                 </MapView.Marker>
             );
         }

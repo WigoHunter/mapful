@@ -16,10 +16,6 @@ export default class MapMarkerClustering extends Component {
         super(props);
         this.state = {
             enableClustering: true,
-            clusterColor: '',
-            clusterTextColor: '',
-            clusterBorderColor: '',
-            clusterBorderWidth: 0,
             numberOfMarkers: 0,
             initDelta: 0,
             region: {
@@ -179,10 +175,6 @@ export default class MapMarkerClustering extends Component {
                     this.state.markersOnMap.unshift(
                         <ClusteredMarker
                             {...marker}
-                            clusterColor={this.state.clusterColor}
-                            clusterTextColor={this.state.clusterTextColor}
-                            clusterBorderColor={this.state.clusterBorderColor}
-                            clusterBorderWidth={this.state.clusterBorderWidth}
                             onClusterPress = {this.state.onClusterPress}
                             belly = {marker.belly}
                         >
@@ -206,11 +198,6 @@ export default class MapMarkerClustering extends Component {
         } else {
             this.state.enableClustering = true;
         }
-
-        this.state.clusterColor = this.props.clusterColor;
-        this.state.clusterTextColor = this.props.clusterTextColor;
-        this.state.clusterBorderColor = this.props.clusterBorderColor;
-        this.state.clusterBorderWidth = this.props.clusterBorderWidth;
 
         return (
             <MapView {...this.state.mapProps}
