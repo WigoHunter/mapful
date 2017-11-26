@@ -3,27 +3,24 @@ import { StyleSheet, Alert, Button, Text, TextInput, View, Image } from 'react-n
 
 const NowLoading = () => (
     <View style={{ 
-			  position: 'absolute',
-			  zIndex: 99999,
-			  height: '100%',
-			  width: '100%',
-			  backgroundColor: '#40404080'
-			}}>
-		<View style={{
-				  alignSelf: 'center',
-				  position: 'absolute',
-				  zIndex: 100000,
-				  top: '45%'
-				  
+		position: 'absolute',
+		zIndex: 99999,
+		height: '100%',
+		width: '100%',
+		alignItems: 'center',
+		justifyContent: 'center',
+		backgroundColor: '#40404080'
+	}}>
+		<Text style={{
+			backgroundColor: '#FFF',
+			paddingLeft: 10,
+			paddingRight: 10,
+			borderWidth: 2,
+			borderColor: 'gray',
+			borderRadius: 3
 		}}>
-			<Text style={{backgroundColor: '#FFF',
-						  marginLeft: 20,
-						  paddingLeft: 10,
-					      borderWidth: 2,
-						  borderColor: 'gray',
-						  borderRadius: 110,
-						  borderWidth: 2}}>Now Loading...</Text>
-		</View>
+			Now Loading...
+		</Text>
 	</View>
 )
 export default NowLoading;
