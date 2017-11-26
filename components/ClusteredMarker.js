@@ -59,14 +59,12 @@ export default class CustomMarker extends Component {
 	dig(child, array){
 		if(child.props.belly!=null){
 			child.props.belly.forEach((childMarker)=>{
-					console.log('add1');
 					array.push(childMarker.props.children.props.children.props.children);
 					this.dig(childMarker,array);
 			})
 		}
 		if(child.belly!=null){
 			child.belly.forEach((childMarker)=>{
-					console.log('add1');
 					array.push(childMarker.props.children.props.children.props.children);
 					this.dig(childMarker,array);
 			})

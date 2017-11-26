@@ -4,8 +4,36 @@ import { Header, Icon } from 'react-native-elements';
 import MapView from 'react-native-maps';
 import TimerMixin from 'react-timer-mixin';
 import db from './utils/db.js';
+import NowLoading from './NowLoading.js'
 
 var CryptoJS = require('crypto-js');
+const Marker = () => (
+    <View
+      style={{
+        width: 24,
+        height: 24,
+        borderTopLeftRadius: 12,
+        borderTopRightRadius: 12,
+        borderBottomLeftRadius: 12,
+        borderBottomRightRadius: 0,
+        backgroundColor: 'red',
+        transform: [{ rotate: '45deg'}],
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 1
+      }}
+    >
+      <View
+        style={{
+          width: 10,
+          height: 10,
+          borderRadius: 5,
+          backgroundColor: '#FFFFFF'
+        }}
+      >
+      </View>
+    </View>
+  );
 export default class Pin extends React.Component {
 	static navigationOptions = {
 		tabBarLabel: 'Pin'
@@ -22,7 +50,8 @@ export default class Pin extends React.Component {
 			numImg:0,
 			img:[],
 			map:false,
-			imgArr:[]
+			imgArr:[],
+			loading : false
 		};
 		
 		this._onPressCurrentLocation();
@@ -87,6 +116,7 @@ export default class Pin extends React.Component {
 			Alert.alert('Title/Text cannot be empty!');
 			return;
 		}
+		this.setState({loading:true});
 		if(this.state.numImg>0){
 			console.log('start uploading images');
 			{this.state.img.map(async (obj,i) =>{
@@ -118,16 +148,19 @@ export default class Pin extends React.Component {
 				Alert.alert('error!');
 				return;
 			}
+			this.setState({imgArr:[],numImg:0,img:[],txt:'',title:'',loading:false});
 			Alert.alert('place the pin successfully!');
-			this.setState({imgArr:[],numImg:0,img:[],txt:'',title:''});
 			}
 				
 		}.bind(this) ,1000);
 		
 	}
     render() {
+    const { loading } = this.state;
 	  if(this.state.map==false)
       return (
+		<View>
+			{loading && <NowLoading/>}
         <ScrollView>
 			<View style={{flexDirection: 'row'}}>
 				<Text>Location: </Text>
@@ -173,6 +206,7 @@ export default class Pin extends React.Component {
 				<Button style={{ top :150,left:100,width:10}} onPress={this._onPressPin.bind(this)}	title="Pin"/>
 			</View>
         </ScrollView>
+		</View>
       );
 	  return (
 	 
