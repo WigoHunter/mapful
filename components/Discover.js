@@ -111,7 +111,7 @@ export default class Discover extends React.Component {
   }
 }
 
-class Callout extends React.Component {
+export class Callout extends React.Component {
   constructor(props) {
     super(props);
 

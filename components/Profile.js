@@ -1,23 +1,23 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image } from 'react-native';
+import { StyleSheet, View, Text, Image, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Header } from 'react-native-elements';
 import MapView from 'react-native-maps';
 import db from './utils/db.js';
+import MapMarkerClustering  from './MapMarkerClustering';
+import { Callout } from './Discover';
 var CryptoJS = require('crypto-js');
 
 const styles = StyleSheet.create({
     profilePicture: {
         alignSelf: 'center',
-        height:100,
-        width:100,
-        borderRadius: 50,
-        marginLeft: '5%',
+        height: 90,
+        width: 90,
+        borderRadius: 45,
+        marginLeft: '10%',
     },
     profileInfo: {
         width: '70%',
-        alignSelf: 'flex-end',
-        height: '100%',
         marginLeft: '5%',
     },
     settings: {
@@ -30,18 +30,14 @@ const styles = StyleSheet.create({
     profileName: {
         fontWeight: 'bold',
         fontSize: 25,
-        marginTop: '5%',
         width: '75%',
     },
     trafficInfo: {
         marginTop: '5%',
-        marginLeft: '-7%',
-        flexDirection: 'row', 
-        height: '65%',
+        flexDirection: 'row',
     },
     block: {
         width: '28%',
-        height: '44%',
     },
     pins: {
         textAlign: 'center',
@@ -56,6 +52,7 @@ const styles = StyleSheet.create({
     categoryAmount: {
         textAlign: 'center',
         fontSize: 25,
+        fontWeight: '300',
     },
     bio: {
         position: 'absolute',
@@ -63,23 +60,68 @@ const styles = StyleSheet.create({
         left: '8%',
         height: '52%',
         width: '85%',
-    }
+    },
+    callout: {
+        width: '100%',
+        height: 270,
+        zIndex: 100000
+    },
 });
 
 var pic;
 export default class Profile extends React.Component {
 	static navigationOptions = {
-    tabBarLabel: 'Profile'
-  };
+        tabBarLabel: 'Profile'
+    };
   
 	constructor(props) {
-		super(props);
-		if(this.props.screenProps.userData.pic.version==''	){
-			this.state={pic : 'http://res.cloudinary.com/comp33302017/image/upload/v1510979878/213810-200_b0flgc.png'};
-		}else{
-			this.state={pic :  `https://res.cloudinary.com/comp33302017/image/upload/v${this.props.screenProps.userData.pic.version}/${this.props.screenProps.userData.pic.id}`};
-		}
+        super(props);
+        
+        this.state = {
+            pic: props.screenProps.userData.pic.version === ''
+                ? 'http://res.cloudinary.com/comp33302017/image/upload/v1510979878/213810-200_b0flgc.png'
+                : `https://res.cloudinary.com/comp33302017/image/upload/v${this.props.screenProps.userData.pic.version}/${this.props.screenProps.userData.pic.id}`,
+            pins: []
+        }
+
+        this.uploadImage = this.uploadImage.bind(this);
+        this.updatePins = this.updatePins.bind(this);
+        this.likePin = this.likePin.bind(this);
     }
+
+    componentWillMount() {
+        this.updatePins();
+    }
+
+    updatePins() {
+        db.collection('Pins')
+            .find({ username: this.props.screenProps.user })
+            .then(pins => {
+                this.setState({ pins })
+            });
+    }
+
+    likePin(id) {
+        db.collection('Pins')
+          .find({ _id: id })
+          .then(docs => {
+            docs[0].likes.includes(this.props.screenProps.user)
+              ? 
+                db.collection('Pins')
+                  .updateOne(
+                    { _id: id },
+                    { $pull: { 'likes': this.props.screenProps.user } }
+                  )
+                  .then(() => this.updatePins())
+              :
+                db.collection('Pins')
+                  .updateOne(
+                    { _id: id },
+                    { $addToSet: { 'likes': this.props.screenProps.user } }
+                  )
+                  .then(() => this.updatePins())
+          });
+      }
 	
 	uploadImage(uri) {
 		  let timestamp = (Date.now() / 1000 | 0).toString();
@@ -101,8 +143,7 @@ export default class Profile extends React.Component {
 			console.log('update database')
 			db.collection('User').updateOne({ 'username': this.props.screenProps.user  }, { $set: { 'profile': tem } }).then(response=>console.log(response)).then(
 			()=>this.props.screenProps.callback())
-			this.setState({pic :  `https://res.cloudinary.com/comp33302017/image/upload/v${res.version}/${res.public_id}`})
-			
+			this.setState({pic :  `https://res.cloudinary.com/comp33302017/image/upload/v${res.version}/${res.public_id}`})	
 		  };
 		  let formdata = new FormData();
 		  formdata.append('file', uri);
@@ -110,58 +151,76 @@ export default class Profile extends React.Component {
 		  formdata.append('api_key', api_key);
 		  formdata.append('signature', signature);
 		  xhr.send(formdata);
-	}
+    }
+    
 	async _onPressUploadImg() {
-			var res=await Expo.ImagePicker.launchImageLibraryAsync({base64:true});
-			if(res.cancelled==false){
-						console.log('Uploading the image...')
-						var url= 'data:image/jpeg;base64,'+res.base64;
-						this.uploadImage(url);
-			}
-	}
+        var res=await Expo.ImagePicker.launchImageLibraryAsync({base64:true});
+        if(res.cancelled==false){
+            console.log('Uploading the image...')
+            var url= 'data:image/jpeg;base64,'+res.base64;
+            this.uploadImage(url);
+        }
+    }
+    
     render() {
-       db.collection('Pins').count({username: this.props.screenProps.user }).then(docs => {this.setState({pin_amt: docs})})
-       return (
-        <View style={{ flex: 1, flexDirection: 'column' }}>
-            <View style={{flex : 0.4, flexDirection: 'row', backgroundColor: '#F2F4F4'}}>
-				<View style={{flexDirection:'column' ,top:10}}>
-					<Image source={{uri:this.state.pic}} style={styles.profilePicture}/>
-					<Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}>Change image</Text>
-				</View>
-                <View style={styles.profileInfo}>
-                    <View style={styles.settings}>
-                        <Icon name="gear" color="black" size={30}/>
+        const { pic, pins } = this.state;
+
+        return (
+            <View style={{ flex: 1, flexDirection: 'column' }}>
+                <View style={{flex : 0.4, flexDirection: 'row', backgroundColor: '#F2F4F4', alignItems: 'center'}}>
+                    <View style={{flexDirection:'column', alignItems: 'center'}}>
+                        <Image
+                            source={{uri: pic}}
+                            style={styles.profilePicture}
+                        />
+                        <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}>Change image</Text>
                     </View>
-                    <Text style={styles.profileName}>{this.props.screenProps.user}</Text>
-                    <View style={styles.trafficInfo}>
-                        <View style={styles.block}>
-                            <Text style={styles.categoryAmount}>{this.state.pin_amt}</Text>
-                            <Text style={styles.pins}>Pins</Text>
-                        </View>
-                        <View style={styles.block}>
-                            <Text style={styles.categoryAmount}>{this.props.screenProps.userData.followers.length}</Text>
-                            <Text style={styles.follows}>Followers</Text>
-                        </View>
-                        <View style={styles.block}>
-                            <Text style={styles.categoryAmount}>{this.props.screenProps.userData.follow.length}</Text>
-                            <Text style={styles.follows}>Following</Text>
-                        </View>
-                        <View style={styles.bio}>
-                            <Text>{this.props.screenProps.userData.intro}</Text>
+                    <View style={styles.profileInfo}>
+                        {/*<View style={styles.settings}>
+                            <Icon name="gear" color="black" size={30}/>
+                        </View>*/}
+                        <Text style={styles.profileName}>{this.props.screenProps.user}</Text>
+                        <View style={styles.trafficInfo}>
+                            <View style={styles.block}>
+                                <Text style={styles.categoryAmount}>{pins.length}</Text>
+                                <Text style={styles.pins}>Pins</Text>
+                            </View>
+                            <View style={styles.block}>
+                                <Text style={styles.categoryAmount}>{this.props.screenProps.userData.followers.length}</Text>
+                                <Text style={styles.follows}>Followers</Text>
+                            </View>
+                            <View style={styles.block}>
+                                <Text style={styles.categoryAmount}>{this.props.screenProps.userData.follow.length}</Text>
+                                <Text style={styles.follows}>Following</Text>
+                            </View>
+                            {/*
+                            <View style={styles.bio}>
+                                <Text>{this.props.screenProps.userData.intro}</Text>
+                            </View>*/}
                         </View>
                     </View>
                 </View>
+                <MapMarkerClustering
+                    style={{ flex: 1 }}
+                    zoomOut
+                >
+                    {pins.map(pin =>
+                        <MapView.Marker
+                            key={pin._id}
+                            coordinate={{
+                                latitude: pin.location.latitude,
+                                longitude: pin.location.longitude
+                            }}
+                        >
+                            <MapView.Callout style={{ zIndex: 100000 }}>
+                                <ScrollView style={styles.callout}>
+                                    <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} />
+                                </ScrollView>
+                            </MapView.Callout>
+                        </MapView.Marker>
+                    )}
+                </MapMarkerClustering>
             </View>
-            <MapView
-                style={{ flex: 1 }}
-                initialRegion={{
-                    latitude: 37.78825,
-                    longitude: -122.4324,
-                    latitudeDelta: 0.0922,
-                    longitudeDelta: 0.0421,
-                }}
-            />
-        </View>
       );
     }
 }
