@@ -1,6 +1,7 @@
 import React from 'react';
 import { StyleSheet, View, Text, Image } from 'react-native';
-import { Header, Icon } from 'react-native-elements';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import { Header } from 'react-native-elements';
 import MapView from 'react-native-maps';
 import db from './utils/db.js';
 var CryptoJS = require('crypto-js');
@@ -19,32 +20,50 @@ const styles = StyleSheet.create({
         height: '100%',
         marginLeft: '5%',
     },
-    trafficInfo: {
-        marginTop: '5%',
-        flexDirection: 'row', 
-        backgroundColor: '#000000',
-        height: '50%',
+    settings: {
+        position: 'absolute',
+        top: '3%',
+        right: '2%',
+        width: '20%',
+        height: '20%',
     },
     profileName: {
         fontWeight: 'bold',
         fontSize: 25,
-        marginTop: '10%',
+        marginTop: '5%',
+        width: '75%',
+    },
+    trafficInfo: {
+        marginTop: '5%',
+        marginLeft: '-7%',
+        flexDirection: 'row', 
+        height: '65%',
     },
     block: {
-        backgroundColor: '#85929E',
-        width: '25%',
-        height: '80%',
+        width: '28%',
+        height: '44%',
     },
     pins: {
         textAlign: 'center',
-        fontSize: 20,
+        fontSize: 10,
+        color: 'grey',
     },
-    followers: {
-
+    follows: {
+        textAlign: 'center',
+        fontSize: 10,
+        color: 'grey',
     },
-    following: {
-
+    categoryAmount: {
+        textAlign: 'center',
+        fontSize: 25,
     },
+    bio: {
+        position: 'absolute',
+        bottom: 0,
+        left: '8%',
+        height: '52%',
+        width: '85%',
+    }
 });
 
 var pic;
@@ -101,25 +120,35 @@ export default class Profile extends React.Component {
 			}
 	}
     render() {
+       db.collection('Pins').count({username: this.props.screenProps.user }).then(docs => {this.setState({pin_amt: docs})})
        return (
         <View style={{ flex: 1, flexDirection: 'column' }}>
             <View style={{flex : 0.4, flexDirection: 'row', backgroundColor: '#F2F4F4'}}>
 				<View style={{flexDirection:'column' ,top:10}}>
 					<Image source={{uri:this.state.pic}} style={styles.profilePicture}/>
-					<Text style={{color:'blue',alignSelf:'center',textDecorationLine:'underline'}} onPress={this._onPressUploadImg.bind(this)}>Update profile image</Text>
+					<Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}>Change image</Text>
 				</View>
                 <View style={styles.profileInfo}>
+                    <View style={styles.settings}>
+                        <Icon name="gear" color="black" size={30}/>
+                    </View>
                     <Text style={styles.profileName}>{this.props.screenProps.user}</Text>
                     <View style={styles.trafficInfo}>
                         <View style={styles.block}>
-                            <Text style={styles.pins}>Pins </Text>
-                        </View>
-                        {/*<View style={styles.block}>
-                            <Text style={styles.followers}>Followers</Text>
+                            <Text style={styles.categoryAmount}>{this.state.pin_amt}</Text>
+                            <Text style={styles.pins}>Pins</Text>
                         </View>
                         <View style={styles.block}>
-                            <Text style={styles.following}>Following</Text>
-                        </View> */}
+                            <Text style={styles.categoryAmount}>{this.props.screenProps.userData.followers.length}</Text>
+                            <Text style={styles.follows}>Followers</Text>
+                        </View>
+                        <View style={styles.block}>
+                            <Text style={styles.categoryAmount}>{this.props.screenProps.userData.follow.length}</Text>
+                            <Text style={styles.follows}>Following</Text>
+                        </View>
+                        <View style={styles.bio}>
+                            <Text>{this.props.screenProps.userData.intro}</Text>
+                        </View>
                     </View>
                 </View>
             </View>
