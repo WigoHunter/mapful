@@ -75,7 +75,7 @@ export default class App extends React.Component {
 		  this.setState({loading:false});
 		  docs.length
         ? (this.setState({isLoggedIn:true,userData:docs[0].profile}))
-        : (Alert.alert('Incorrect username/password!'))
+        : (Alert.alert('Incorrect username or password!'))
       })
   }
   
@@ -89,7 +89,7 @@ export default class App extends React.Component {
             db.collection('User')
               .find({ username:this.state.username })
               .then(docs => docs.length
-                ? (Alert.alert('This username has been registered'))
+                ? (Alert.alert('This username has already been registered'))
                 :(
                   db.collection('User')
                     .insert({
@@ -139,11 +139,11 @@ export default class App extends React.Component {
             </View>
 
             <View style={{flexDirection: 'row',alignItems: 'center', justifyContent: 'center', marginTop: 30 }} >
-              <Button style={{ top :150,left:40,width:10}}
+              <Button color='#FFF' style={{ top :150,left:40,width:10}}
                 onPress={ this._onPressLogin.bind(this)}
                 title="Login"
               />
-              <Button style={{ top :150,left:100,width:10}}
+              <Button color='#FFF' style={{ top :150,left:100,width:10}}
                 onPress={this._onPressRegister.bind(this)}
                 title="Register"
               />

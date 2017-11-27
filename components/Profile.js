@@ -18,6 +18,8 @@ const styles = StyleSheet.create({
     },
     profileInfo: {
         width: '70%',
+        alignSelf: 'flex-end',
+        height: '100%',
         marginLeft: '5%',
     },
     settings: {
@@ -29,15 +31,19 @@ const styles = StyleSheet.create({
     },
     profileName: {
         fontWeight: 'bold',
-        fontSize: 25,
+        fontSize: 28,
+        marginTop: '5%',
         width: '75%',
     },
     trafficInfo: {
         marginTop: '5%',
-        flexDirection: 'row',
+        marginLeft: '-8%',
+        flexDirection: 'row', 
+        height: '65%',
     },
     block: {
         width: '28%',
+        marginLeft: '-2%',
     },
     pins: {
         textAlign: 'center',
@@ -59,7 +65,7 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: '8%',
         height: '52%',
-        width: '85%',
+        width: '80%',
     },
     callout: {
         width: '100%',
@@ -167,13 +173,13 @@ export default class Profile extends React.Component {
 
         return (
             <View style={{ flex: 1, flexDirection: 'column' }}>
-                <View style={{flex : 0.4, flexDirection: 'row', backgroundColor: '#F2F4F4', alignItems: 'center'}}>
+                <View style={{flex : 0.4, flexDirection: 'row', alignItems: 'center'}}>
                     <View style={{flexDirection:'column', alignItems: 'center'}}>
                         <Image
                             source={{uri: pic}}
                             style={styles.profilePicture}
                         />
-                        <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}>Change image</Text>
+                        <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}> Change image</Text>
                     </View>
                     <View style={styles.profileInfo}>
                         {/*<View style={styles.settings}>
@@ -193,10 +199,9 @@ export default class Profile extends React.Component {
                                 <Text style={styles.categoryAmount}>{this.props.screenProps.userData.follow.length}</Text>
                                 <Text style={styles.follows}>Following</Text>
                             </View>
-                            {/*
                             <View style={styles.bio}>
                                 <Text>{this.props.screenProps.userData.intro}</Text>
-                            </View>*/}
+                            </View>
                         </View>
                     </View>
                 </View>

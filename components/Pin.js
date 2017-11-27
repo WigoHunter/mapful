@@ -1,12 +1,108 @@
 import React from 'react';
-import { StyleSheet, Button, View, TextInput, ScrollView, Text, Alert, Image } from 'react-native';
-import { Header, Icon } from 'react-native-elements';
+import { StyleSheet, Button, View, TouchableOpacity, TextInput, ScrollView, Text, Alert, Image } from 'react-native';
+import { Header } from 'react-native-elements';
 import MapView from 'react-native-maps';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import TimerMixin from 'react-timer-mixin';
 import db from './utils/db.js';
 import NowLoading from './NowLoading.js'
 
 var CryptoJS = require('crypto-js');
+const styles = StyleSheet.create({
+	addbox: {
+		position: 'absolute',
+		left: 0,
+		top: 0,
+		margin: '5%',
+		width: '20%',
+		height: '10%',
+		backgroundColor: '#F2F3F4',
+    	justifyContent: 'center',
+    	alignItems: 'center',
+	},
+	mylocation: {
+		position: 'absolute',
+		left: 0,
+		top: '25%',
+		margin: '5%',
+		width: '20%',
+		height: '10%',
+		backgroundColor: '#F2F3F4',
+    	justifyContent: 'center',
+    	alignItems: 'center',
+	},
+	pinlocation: {
+		position: 'absolute',
+		left: 0,
+		top: '42.7%',
+		margin: '5%',
+		width: '20%',
+		height: '10%',
+		backgroundColor: '#F2F3F4',
+    	justifyContent: 'center',
+    	alignItems: 'center',
+	},
+	delete: {
+		position: 'absolute',
+		top:0,
+		right: '4%',
+		width: '20%',
+		height: '100%',
+		marginRight: '5%',
+		backgroundColor: '#F2F3F4',
+    	justifyContent: 'center',
+    	alignItems: 'center',
+	},
+	sharepin: {
+		position: 'absolute',
+		right: 0,
+		top: '42.7%',
+		margin: '5%',
+		width: 205,
+		height: '12.35%',
+		backgroundColor: '#F2F3F4',
+    	justifyContent: 'center',
+    	alignItems: 'center',
+	},
+	newpost: {
+		marginLeft: '5%',
+		marginTop: '5%',
+		fontSize: 25,
+		fontWeight: 'bold',
+	},
+	title: {
+		position: 'absolute',
+		right: 0,
+		top: 0,
+		margin: '5%',
+		paddingLeft: 10,
+		width : 205, 
+		height: 24, 
+		borderColor: '#E5E7E9', 
+		borderWidth: 1,
+	},
+	caption: {
+		position: 'absolute',
+		right: 0,
+		margin: '5%',
+		marginTop: '30%',
+		paddingLeft: 10,
+		width : 205, 
+		height: 79,
+		borderColor: '#E5E7E9', 
+		borderWidth: 1,
+	},
+	picture: {
+		position: 'absolute',
+		left: 0,
+		bottom: '3%',
+		margin: '5%',
+		width : '100%', 
+		height: 160,
+	}
+});
+
 const Marker = () => (
     <View
       style={{
@@ -149,7 +245,7 @@ export default class Pin extends React.Component {
 				return;
 			}
 			this.setState({imgArr:[],numImg:0,img:[],txt:'',title:'',loading:false});
-			Alert.alert('place the pin successfully!');
+			Alert.alert('Pin is shared!');
 			}
 				
 		}.bind(this) ,1000);
@@ -159,53 +255,41 @@ export default class Pin extends React.Component {
     const { loading } = this.state;
 	  if(this.state.map==false)
       return (
-		<View>
+        <View style={{ flex: 1, flexDirection: 'column' }}>
 			{loading && <NowLoading/>}
-        <ScrollView>
-			<View style={{flexDirection: 'row'}}>
-				<Text>Location: </Text>
-				<Button style={{width : 40,height:40}} onPress={this._onPressCurrentLocation.bind(this)}	title="Use my current location"/>
-			</View> 
-			<View style={{marginLeft:60,width: 240, height: 50}} >
-				<Button  onPress={this._onPressLocationOnMap.bind(this)}	title="Choose a place on the map"/>
+				<Text style={styles.newpost}>
+	        		Share new pin
+	        	</Text>
+				<View style={{ flex: 1, flexDirection: 'row'}}>
+	        		<TouchableOpacity style={styles.addbox} onPress={this._onPressUploadImg.bind(this)}>
+	        			<Icon name="plus" color="black" size={40}/>
+	        		</TouchableOpacity>
+	        		<TextInput style={styles.title}  placeholder="Write a title..." onChangeText={(title) => this.setState({title})} value = {this.state.title}/>
+        		</View>
+        		<TextInput textAlignVertical='top' multiline={true} style={styles.caption}  placeholder="Write a caption..." onChangeText={(txt) => this.setState({txt})} value = {this.state.txt}/>
+	        	<TouchableOpacity style={styles.mylocation} onPress={this._onPressCurrentLocation.bind(this)}>
+		        		<Icon2 name="my-location" color="black" size={40}/>
+	        	</TouchableOpacity>
+	        	<TouchableOpacity style={styles.pinlocation} onPress={this._onPressLocationOnMap.bind(this)}>
+	        		<Icon2 name="location-on" color="red" size={40}/>
+	        	</TouchableOpacity>
+	        	<TouchableOpacity style={styles.sharepin} onPress={this._onPressPin.bind(this)}>
+					<Text style={{fontWeight:'bold', color:'#1EE494'}}>Share</Text>
+	        	</TouchableOpacity>
+				<View style={styles.picture}>
+					{this.state.img.map((obj,i) =>
+						<View key={i}>
+						<Image key={i+1000} source={{uri:obj.path}} style={{height:160,width:216,}}/>
+						<TouchableOpacity key={i-2000} style={styles.delete} onPress={()=>{
+						  var array = this.state.img;
+						  array.splice(i, 1);
+						  this.setState({img: array,numImg:this.state.numImg-1});
+						  }}>
+						  <Icon name="remove" color="black" size={40}/>
+						</TouchableOpacity>
+						</View>
+					  )}
 				</View>
-			<View style={{flexDirection: 'row',marginLeft:60}}>
-				<Text>latitude:{this.state.location.latitude} </Text>
-			</View>
-			<View style={{flexDirection: 'row',marginLeft:60}}>
-				<Text>longitude:{this.state.location.longitude}  </Text>
-			</View>
-			<View style={{flexDirection: 'row',marginLeft:60}}>
-				<Button  onPress={this._onPressUploadImg.bind(this)}	title="Upload Image"/>
-			</View>
-			<View style={{flexDirection: 'row',marginLeft:60,marginRight:60, flexWrap: 'wrap', alignItems: 'flex-start'}}>
-				{this.state.img.map((obj,i) =>
-					<View key={i}style={{flexDirection:'column'}}>
-					<Image key={i+1000} source={{uri:obj.path}} style={{
-																								height:100,
-																								width:100,
-																																}}/>
-					<Text key={i-2000} style={{color:'blue',alignSelf:'center',textDecorationLine:'underline'}} onPress={()=>{
-					  var array = this.state.img;
-					  array.splice(i, 1);
-					  this.setState({img: array,numImg:this.state.numImg-1});
-					  }}
-						>Delete</Text>
-					</View>
-				  )}
-			</View>
-			<View style={{flexDirection: 'row',marginTop:10}}>
-				<Text>Title: </Text>
-	<TextInput   style={{left: 20, width : 280, height: 30, borderColor: 'gray', borderWidth: 2}}  placeholder="" onChangeText={(title) => this.setState({title})} value = {this.state.title}/>
-			</View>
-			<View style={{flexDirection: 'row',marginTop:10}}>
-				<Text>Text: </Text>
-	<TextInput textAlignVertical='top' multiline={true} style={{left: 20, width : 280, height: 150, borderColor: 'gray', borderWidth: 2}}  placeholder="What are you thinking now?" onChangeText={(txt) => this.setState({txt})} value = {this.state.txt}/>
-			</View>
-			<View style={{marginLeft:120,marginTop:30,width: 100, height: 80}} >
-				<Button style={{ top :150,left:100,width:10}} onPress={this._onPressPin.bind(this)}	title="Pin"/>
-			</View>
-        </ScrollView>
 		</View>
       );
 	  return (
