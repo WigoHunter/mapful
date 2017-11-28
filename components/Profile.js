@@ -169,6 +169,41 @@ export default class Profile extends React.Component {
         }
     }
     
+    _onPressFollow(){
+		db.collection('User')
+      .find({ username: this.props.screenProps.user })
+      .then(docs => {
+        docs[0].profile.followers.includes(this.props.screenProps.guest)
+          ? (
+			  db.collection('User')
+              .updateOne(
+                { username: this.props.screenProps.guest },
+                { $pull: { 'follow': this.props.screenProps.user } }
+              ).then(()=>
+			  db.collection('User')
+              .updateOne(
+                { username: this.props.screenProps.user },
+                { $set: { 'followers': this.props.screenProps.guest } }
+              )).then(() => this.props.screenProps.update())).then(()=>console.log('unfollowed'))
+          :(db.collection('User')
+      .find({ username: this.props.screenProps.guest }).then(docss=>
+			docs[0].profile.followers.push(this.props.screenProps.guest),
+			docss[0].profile.follow.push(this.props.screenProps.user),
+		    db.collection('User')
+              .updateOne(
+                { username: this.props.screenProps.guest },
+                { $set: { 'profile': docss[0],profile } },
+				()=>console.log('error')
+              ).then(()=>
+            db.collection('User')
+              .updateOne(
+                { username: this.props.screenProps.user },
+                { $set: { 'profile': docs[0].profile } },
+				()=>console.log('error')
+              ))).then((ret) =>{console.log(ret);
+			  this.props.screenProps.update()})).then(()=>console.log('followed\n'))
+      });
+	}
     render() {
         const { pic, pins } = this.state;
 
@@ -188,7 +223,8 @@ export default class Profile extends React.Component {
                             source={{uri: pic}}
                             style={styles.profilePicture}
                         />
-                        {this.props.screenProps.guest==false && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}> Change image</Text>}
+                        {this.props.screenProps.guest=='' && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}> Change image</Text>}
+						{this.props.screenProps.guest!='' && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressFollow.bind(this)}>follow{this.props.screenProps.userData.followers.includes(this.props.screenProps.guest)?'ed':''}</Text>}
                     </View>
                     <View style={styles.profileInfo}>
                         {/*<View style={styles.settings}>

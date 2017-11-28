@@ -120,7 +120,7 @@ export default class Discover extends React.Component {
       </View>
     );}
 	return(
-		<Profile screenProps={{user: this.state.username,userData:this.state.profileData,callback:()=>{
+		<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,callback:()=>{
 		this.setState({goToProfile:''})}
 			, guest:true}}/>
 	)
