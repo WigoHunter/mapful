@@ -170,6 +170,7 @@ export default class Profile extends React.Component {
     }
     
     _onPressFollow(){
+        /*
 		db.collection('User')
       .find({ username: this.props.screenProps.user })
       .then(docs => {
@@ -203,7 +204,9 @@ export default class Profile extends React.Component {
               ))).then((ret) =>{console.log(ret);
 			  this.props.screenProps.update()})).then(()=>console.log('followed\n'))
       });
-	}
+      */
+    }
+    
     render() {
         const { pic, pins } = this.state;
 
