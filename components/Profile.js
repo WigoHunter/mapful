@@ -1,6 +1,7 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image, ScrollView, Button } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, Image, ScrollView, Button } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Icon2 from 'react-native-vector-icons/MaterialIcons';
 import { Header } from 'react-native-elements';
 import MapView from 'react-native-maps';
 import db from './utils/db.js';
@@ -212,14 +213,16 @@ export default class Profile extends React.Component {
 
         return (
             <View style={{ flex: 1, flexDirection: 'column' }}>
-				{this.props.screenProps.guest==true && <View style={{ 
+				{this.props.screenProps.guest!="" && <View style={{ 
 				  position: 'absolute',
 				  zIndex: 100,
 				  top: 0,
 				  left: 0
 				}}>
-					<Button style={{width:10}} onPress= {()=>this.props.screenProps.callback()}	title="Back"/>
-				</View>}
+                <TouchableOpacity>
+                    <Icon2 name="arrow-back" color="black" size={30} onPress= {()=>this.props.screenProps.callback()}/>
+                </TouchableOpacity>				
+                </View>}
                 <View style={{flex : 0.4, flexDirection: 'row', alignItems: 'center'}}>
                     <View style={{flexDirection:'column', alignItems: 'center'}}>
                         <Image
@@ -230,9 +233,6 @@ export default class Profile extends React.Component {
 						{/* this.props.screenProps.guest!='' && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressFollow.bind(this)}>follow{this.props.screenProps.userData.followers.includes(this.props.screenProps.guest)?'ed':''}</Text> */}
                     </View>
                     <View style={styles.profileInfo}>
-                        {/*<View style={styles.settings}>
-                            <Icon name="gear" color="black" size={30}/>
-                        </View>*/}
                         <Text style={styles.profileName}>{this.props.screenProps.user}</Text>
                         <View style={styles.trafficInfo}>
                             <View style={styles.block}>
