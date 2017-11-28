@@ -2,6 +2,9 @@ import React from 'react';
 import { Image } from 'react-native';
 
 class DeferredImage extends React.Component {
+	setNativeProps = (nativeProps) => {
+    this._root.setNativeProps(nativeProps);
+  }
     constructor(props) {
       super(props);
   

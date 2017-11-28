@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, Image, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, Image, ScrollView, Button } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { Header } from 'react-native-elements';
 import MapView from 'react-native-maps';
@@ -173,13 +173,21 @@ export default class Profile extends React.Component {
 
         return (
             <View style={{ flex: 1, flexDirection: 'column' }}>
+				{this.props.screenProps.guest==true && <View style={{ 
+				  position: 'absolute',
+				  zIndex: 100,
+				  top: 0,
+				  left: 0
+				}}>
+					<Button style={{width:10}} onPress= {()=>this.props.screenProps.callback()}	title="Back"/>
+				</View>}
                 <View style={{flex : 0.4, flexDirection: 'row', alignItems: 'center'}}>
                     <View style={{flexDirection:'column', alignItems: 'center'}}>
                         <Image
                             source={{uri: pic}}
                             style={styles.profilePicture}
                         />
-                        <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}> Change image</Text>
+                        {this.props.screenProps.guest==false && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}> Change image</Text>}
                     </View>
                     <View style={styles.profileInfo}>
                         {/*<View style={styles.settings}>

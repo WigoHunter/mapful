@@ -63,7 +63,8 @@ export default class Discover extends React.Component {
 
   render() {
     const { region, pins } = this.state;
-
+	if(this.state.goToProfile=='')
+    {
     return (
       <View style={{ flex: 1 }}>
         <View style={{
@@ -100,14 +101,27 @@ export default class Discover extends React.Component {
             >
               <MapView.Callout style={{ zIndex: 100000 }}>
                 <ScrollView style={styles.callout}>
-                  <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} />
+                  <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} 
+					goToProfile={(user)=>{
+						db.collection('User')
+						  .find({ username: user})
+						  .then(docs => {(
+						  console.log(docs[0]),
+						this.setState({
+						profileData:docs[0].profile,goToProfile:user}))})
+					}}				  />
                 </ScrollView>
               </MapView.Callout>
             </MapView.Marker>
           )}
         </MapMarkerClustering>
       </View>
-    );
+    );}
+	return(
+		<Profile screenProps={{user: this.state.username,userData:this.state.profileData,callback:()=>{
+		this.setState({goToProfile:''})}
+			, guest:true}}/>
+	)
   }
 }
 
@@ -148,7 +162,7 @@ export class Callout extends React.Component {
       <View style={{ marginTop: 5, marginBottom: 5 }}>
         <Text style={styles.title}>{pin.title}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.username}>{pin.username}</Text>
+          <Text style={styles.username} onPress={()=>this.props.goToProfile(pin.username)}>{pin.username}</Text>
           <Text style={styles.time}>{`${pin.time.getDate()} / ${pin.time.getMonth()} / ${pin.time.getFullYear()}`}</Text>
         </View>
         {(pin.image != null && pin.image.length > 0) &&

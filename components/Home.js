@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, StyleSheet, View, TouchableOpacity, ScrollView, Text, TextInput, Image, RefreshControl } from 'react-native';
+import { Alert, StyleSheet, View, TouchableOpacity, ScrollView, Text, TextInput, Image, RefreshControl, TouchableHighlight } from 'react-native';
 import { Header } from 'react-native-elements';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import MapView from 'react-native-maps';
@@ -7,6 +7,7 @@ import { LazyloadScrollView, LazyloadImage } from 'react-native-lazyload';
 import db from './utils/db.js';
 import { mapIdToProfilePicture } from './utils/utils.js';
 import DeferredImage from './DeferredRender.js';
+import Profile from './Profile.js'
 
 export default class Home extends React.Component {
 	static navigationOptions = {
@@ -18,7 +19,8 @@ export default class Home extends React.Component {
 
     this.state = {
       pins: [],
-      refreshing: false
+      refreshing: false,
+	  goToProfile: ''
     };
 
     this.updatePins = this.updatePins.bind(this);
@@ -83,8 +85,8 @@ export default class Home extends React.Component {
 
   render() {
     const { pins } = this.state;
-
-    return (
+	if(this.state.goToProfile=='')
+    {return (
       <LazyloadScrollView
         style={styles.home}
         name="lazyload-scrollview"
@@ -104,10 +106,23 @@ export default class Home extends React.Component {
             user={this.props.screenProps.user}
             updatePins={this.updatePins}
             userData={this.props.screenProps.userData}
+			goToProfile={(user)=>{
+				db.collection('User')
+				  .find({ username: user})
+				  .then(docs => {(
+				  console.log(docs[0]),
+				this.setState({
+				profileData:docs[0].profile,goToProfile:user}))})
+			}}
           />
         ))}
       </LazyloadScrollView>
-    );
+	)}
+	return(
+		<Profile screenProps={{user: this.state.username,userData:this.state.profileData,callback:()=>{
+		this.setState({goToProfile:''})}
+			, guest:true}}/>
+	)
   }
 }
 
@@ -165,17 +180,17 @@ class Post extends React.Component {
       <View style={styles.pin}>
         <Text style={styles.title} onPress={() => this.destoryPins()}>{pin.title}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Text style={styles.username}>{pin.username}</Text>
+          <Text style={styles.username} onPress={()=>this.props.goToProfile(pin.username)}>{pin.username}</Text>
           <Text style={styles.time}>{`${pin.time.getDate()} / ${pin.time.getMonth()} / ${pin.time.getFullYear()}`}</Text>
         </View>
-        {(pin.image != null && pin.image.length > 0) &&
+        {/*(pin.image != null && pin.image.length > 0) &&
           <LazyloadImage
             host={host}
             source={{ uri: `https://res.cloudinary.com/comp33302017/image/upload/v${pin.image[0].version}/${pin.image[0].id}` }}
             style={styles.img}
             resizeMode="cover"
           />
-        }
+        */}
 
         <Text style={styles.txt} onPress={() => this.destoryUsers()}>{pin.txt}</Text>
         <View

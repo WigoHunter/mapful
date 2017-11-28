@@ -96,7 +96,7 @@ export default class App extends React.Component {
                       username: this.state.username,
                       pass: this.state.pass,
                       profile: {
-                        pic: {version:'',id:''},
+                        pic: {version:'1510979878',id:'213810-200_b0flgc'},
                         intro: '',
                         follow: [],
                         followers: [],
@@ -169,7 +169,7 @@ export default class App extends React.Component {
               }
               backgroundColor="#1EE494"
           />
-          <RootTabs screenProps={{user: this.state.username,userData:this.state.userData,callback:this.update.bind(this)}} />
+          <RootTabs screenProps={{user: this.state.username,userData:this.state.userData,callback:this.update.bind(this), guest:false}} />
         </View>
       );
     }
