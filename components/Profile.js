@@ -7,7 +7,6 @@ import db from './utils/db.js';
 import MapMarkerClustering  from './MapMarkerClustering';
 import { Callout } from './Discover';
 
-
 var CryptoJS = require('crypto-js');
 
 const styles = StyleSheet.create({
@@ -215,26 +214,49 @@ export default class Profile extends React.Component {
                         </View>
                     </View>
                 </View>
-                <MapMarkerClustering
-                    style={{ flex: 1 }}
-                    zoomOut
-                >
-                    {pins.map(pin =>
-                        <MapView.Marker
-                            key={pin._id}
-                            coordinate={{
-                                latitude: pin.location.latitude,
-                                longitude: pin.location.longitude
+                <View style={{ flex: 1 }}>
+                    <View style={{
+                        position: 'absolute',
+                        zIndex: 100,
+                        top: 20,
+                        right: 20,
+                    }}>
+                        <Text
+                            onPress={() => this.updatePins()}
+                            style={{
+                            paddingTop: 5,
+                            paddingBottom: 5,
+                            paddingRight: 8,
+                            paddingLeft: 8,
+                            borderRadius: 6,
+                            backgroundColor: '#1EE494',
+                            color: '#FFF'
                             }}
                         >
-                            <MapView.Callout style={{ zIndex: 100000 }}>
-                                <ScrollView style={styles.callout}>
-                                    <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} />
-                                </ScrollView>
-                            </MapView.Callout>
-                        </MapView.Marker>
-                    )}
-                </MapMarkerClustering>
+                            Update
+                        </Text>
+                    </View>
+                    <MapMarkerClustering
+                        style={{ flex: 1 }}
+                        zoomOut
+                    >
+                        {pins.map(pin =>
+                            <MapView.Marker
+                                key={pin._id}
+                                coordinate={{
+                                    latitude: pin.location.latitude,
+                                    longitude: pin.location.longitude
+                                }}
+                            >
+                                <MapView.Callout style={{ zIndex: 100000 }}>
+                                    <ScrollView style={styles.callout}>
+                                        <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} />
+                                    </ScrollView>
+                                </MapView.Callout>
+                            </MapView.Marker>
+                        )}
+                    </MapMarkerClustering>
+                </View>
             </View>
       );
     }

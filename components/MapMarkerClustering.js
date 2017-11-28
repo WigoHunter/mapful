@@ -21,8 +21,8 @@ export default class MapMarkerClustering extends Component {
             region: {
                 latitude: 22.282462956240902,
                 longitude: 114.1280245223424,
-                latitudeDelta: props.zoomOut ? 10 : 0.0922,
-                longitudeDelta: props.zoomOut ? 10 : 0.0421
+                latitudeDelta: props.zoomOut ? 100 : 0.0922,
+                longitudeDelta: props.zoomOut ? 100 : 0.0421
             },
             markers: new Set(),
             markersOnMap: [],
@@ -109,8 +109,8 @@ export default class MapMarkerClustering extends Component {
                 region: {
                     latitude: pos.coords.latitude,
                     longitude: pos.coords.longitude,
-                    latitudeDelta: this.props.zoomOut ? 10 : 0.0922,
-                    longitudeDelta: this.props.zoomOut ? 10 : 0.0421
+                    latitudeDelta: this.props.zoomOut ? 100 : 0.0922,
+                    longitudeDelta: this.props.zoomOut ? 100 : 0.0421
                 }
             });
         }, Options);
