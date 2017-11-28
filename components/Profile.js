@@ -224,7 +224,7 @@ export default class Profile extends React.Component {
                             style={styles.profilePicture}
                         />
                         {this.props.screenProps.guest=='' && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}> Change image</Text>}
-						{this.props.screenProps.guest!='' && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressFollow.bind(this)}>follow{this.props.screenProps.userData.followers.includes(this.props.screenProps.guest)?'ed':''}</Text>}
+						{/* this.props.screenProps.guest!='' && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressFollow.bind(this)}>follow{this.props.screenProps.userData.followers.includes(this.props.screenProps.guest)?'ed':''}</Text> */}
                     </View>
                     <View style={styles.profileInfo}>
                         {/*<View style={styles.settings}>
