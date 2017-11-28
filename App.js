@@ -74,7 +74,7 @@ export default class App extends React.Component {
       .then(docs => {
 		  this.setState({loading:false});
 		  docs.length
-        ? (this.setState({isLoggedIn:true,userData:docs[0].profile}))
+        ? (this.setState({isLoggedIn:true,userData:docs[0].profile}),console.log(this.state))
         : (Alert.alert('Incorrect username or password!'))
       })
   }
@@ -102,6 +102,7 @@ export default class App extends React.Component {
                         followers: [],
                       }
                     })
+					
                     .then(_ => {
                      this._onPressLogin(); 
                     })

@@ -6,6 +6,8 @@ import MapView from 'react-native-maps';
 import db from './utils/db.js';
 import MapMarkerClustering  from './MapMarkerClustering';
 import { Callout } from './Discover';
+
+
 var CryptoJS = require('crypto-js');
 
 const styles = StyleSheet.create({
@@ -82,9 +84,9 @@ export default class Profile extends React.Component {
   
 	constructor(props) {
         super(props);
-        
+        console.log(this.props.screenProps)
         this.state = {
-            pic: props.screenProps.userData.pic.version === ''
+            pic: this.props.screenProps.userData.pic.version == ''
                 ? 'http://res.cloudinary.com/comp33302017/image/upload/v1510979878/213810-200_b0flgc.png'
                 : `https://res.cloudinary.com/comp33302017/image/upload/v${this.props.screenProps.userData.pic.version}/${this.props.screenProps.userData.pic.id}`,
             pins: []

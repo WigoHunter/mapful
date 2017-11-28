@@ -7,6 +7,7 @@ import MapMarkerClustering  from './MapMarkerClustering'
 import db from './utils/db.js';
 import { mapIdToProfilePicture } from './utils/utils.js';
 import DeferredImage from './DeferredRender.js';
+import Profile from './Profile.js'
 
 export default class Discover extends React.Component {
   static navigationOptions = {
@@ -17,7 +18,8 @@ export default class Discover extends React.Component {
     super(props);
 
     this.state = {
-      pins: []
+      pins: [],
+	  goToProfile: ''
     };
 
     this.OnRegionChange = this.OnRegionChange.bind(this);
