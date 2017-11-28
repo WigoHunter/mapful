@@ -177,7 +177,7 @@ class Post extends React.Component {
 
     return (
       <View style={styles.pin}>
-        <Text style={styles.title} onPress={() => this.destoryPins()}>{pin.title}</Text>
+        <Text style={styles.title}>{pin.title}</Text>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Text style={styles.username} onPress={()=>this.props.goToProfile(pin.username)}>{pin.username}</Text>
           <Text style={styles.time}>{`${pin.time.getDate()} / ${pin.time.getMonth()} / ${pin.time.getFullYear()}`}</Text>
@@ -191,7 +191,7 @@ class Post extends React.Component {
           />
         */}
 
-        <Text style={styles.txt} onPress={() => this.destoryUsers()}>{pin.txt}</Text>
+        <Text style={styles.txt}>{pin.txt}</Text>
         <View
           style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, marginBottom: 5 }}
         >
