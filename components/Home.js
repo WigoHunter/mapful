@@ -183,14 +183,14 @@ class Post extends React.Component {
           <Text style={styles.username} onPress={()=>this.props.goToProfile(pin.username)}>{pin.username}</Text>
           <Text style={styles.time}>{`${pin.time.getDate()} / ${pin.time.getMonth()} / ${pin.time.getFullYear()}`}</Text>
         </View>
-        {/*(pin.image != null && pin.image.length > 0) &&
+        {(pin.image != null && pin.image.length > 0) &&
           <LazyloadImage
             host={host}
             source={{ uri: `https://res.cloudinary.com/comp33302017/image/upload/v${pin.image[0].version}/${pin.image[0].id}` }}
             style={styles.img}
             resizeMode="cover"
           />
-        */}
+        }
 
         <Text style={styles.txt} onPress={() => this.destoryUsers()}>{pin.txt}</Text>
         <View
