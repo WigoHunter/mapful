@@ -85,8 +85,31 @@ export default class Home extends React.Component {
 
   render() {
     const { pins } = this.state;
-	if(this.state.goToProfile=='')
-    {return (
+	return (
+	<View style = {{flex:1}} >
+	 {this.state.goToProfile!=''&&
+		  <View style={{
+          position: 'absolute',
+          zIndex: 1000,
+		  backgroundColor:'white',
+		  height: '100%',
+		  width: '100%'
+		  }}>
+		<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,callback:()=>{
+		this.setState({goToProfile:''})}
+			, guest:this.props.screenProps.user
+			
+			, update:()=>{
+				db.collection('User')
+						  .find({ username: this.state.goToProfile})
+						  .then(docs => {(
+						  console.log(docs[0]),
+						this.setState({
+						profileData:docs[0].profile}))});
+						this.props.screenProps.callback()}
+						}}/>
+		</View>
+		}
       <LazyloadScrollView
         style={styles.home}
         name="lazyload-scrollview"
@@ -117,20 +140,7 @@ export default class Home extends React.Component {
           />
         ))}
       </LazyloadScrollView>
-	)}
-	return(
-		<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,callback:()=>{
-		this.setState({goToProfile:''})}
-			, guest:this.props.screenProps.user
-			
-			, update:()=>{
-				db.collection('User')
-						  .find({ username: this.state.goToProfile})
-						  .then(docs => {(
-						  console.log(docs[0]),
-						this.setState({
-						profileData:docs[0].profile}))})}
-						}}/>
+	  </View>
 	)
   }
 }
@@ -182,13 +192,13 @@ class Post extends React.Component {
           <Text style={styles.username} onPress={()=>this.props.goToProfile(pin.username)}>{pin.username}</Text>
           <Text style={styles.time}>{`${pin.time.getDate()} / ${pin.time.getMonth()} / ${pin.time.getFullYear()}`}</Text>
         </View>
-        {(pin.image != null && pin.image.length > 0) &&
+        {/*(pin.image != null && pin.image.length > 0) &&
           <LazyloadImage
             host={host}
             source={{ uri: `https://res.cloudinary.com/comp33302017/image/upload/v${pin.image[0].version}/${pin.image[0].id}` }}
             style={styles.img}
             resizeMode="cover"
-          />
+          />*/
         }
 
         <Text style={styles.txt}>{pin.txt}</Text>
@@ -213,6 +223,9 @@ class Post extends React.Component {
           <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
             {pin.comments.map((comment, i) => (
               <View style={styles.comment} key={i}>
+			  
+                <TouchableOpacity
+				  onPress= {()=>this.props.goToProfile(comment.user)}>
                 <DeferredImage
                   promise={mapIdToProfilePicture(comment.user)}
                   then={<View style={{ width: 24, height: 24 }} />}
@@ -223,6 +236,7 @@ class Post extends React.Component {
                     marginRight: 6
                   }}
                 />
+                </TouchableOpacity>	
                 <Text style={styles.commentText}>{comment.txt}</Text>
               </View>
             ))}

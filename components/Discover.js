@@ -65,10 +65,32 @@ export default class Discover extends React.Component {
 
   render() {
     const { region, pins } = this.state;
-	if(this.state.goToProfile=='')
-    {
     return (
       <View style={{ flex: 1 }}>
+		  {this.state.goToProfile!=''&&
+		  <View style={{
+          position: 'absolute',
+		  flex: 1,
+          zIndex: 1000,
+		  backgroundColor:'white',
+		  height: '100%',
+		  width: '100%'
+		  }}>
+		<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,callback:()=>{
+		this.setState({goToProfile:''})}
+			, guest:this.props.screenProps.user
+			
+			, update:()=>{
+				db.collection('User')
+						  .find({ username: this.state.goToProfile})
+						  .then(docs => {(
+						  console.log(docs[0]),
+						this.setState({
+						profileData:docs[0].profile}))});
+						this.props.screenProps.callback()}
+						}}/>
+		</View>
+		}
         <View style={{
           position: 'absolute',
           zIndex: 100,
@@ -118,12 +140,7 @@ export default class Discover extends React.Component {
           )}
         </MapMarkerClustering>
       </View>
-    );}
-	return(
-		<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,callback:()=>{
-		this.setState({goToProfile:''})}
-			, guest:true}}/>
-	)
+  )
   }
 }
 
@@ -203,6 +220,8 @@ export class Callout extends React.Component {
           <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
             {pin.comments.map((comment, i) => (
               <View style={styles.comment} key={i}>
+                <TouchableOpacity
+				  onPress= {()=>this.props.goToProfile(comment.user)}>
                 <DeferredImage
                   promise={mapIdToProfilePicture(comment.user)}
                   then={<View style={{ width: 20, height: 20 }} />}
@@ -213,6 +232,7 @@ export class Callout extends React.Component {
                     marginRight: 3
                   }}
                 />
+                </TouchableOpacity>	
                 <Text>{comment.txt}</Text>
               </View>
             ))}

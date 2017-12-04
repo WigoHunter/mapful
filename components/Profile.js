@@ -89,7 +89,8 @@ export default class Profile extends React.Component {
             pic: this.props.screenProps.userData.pic.version == ''
                 ? 'http://res.cloudinary.com/comp33302017/image/upload/v1510979878/213810-200_b0flgc.png'
                 : `https://res.cloudinary.com/comp33302017/image/upload/v${this.props.screenProps.userData.pic.version}/${this.props.screenProps.userData.pic.id}`,
-            pins: []
+            pins: [],
+		    goToProfile: ''
         }
 
         this.uploadImage = this.uploadImage.bind(this);
@@ -171,30 +172,20 @@ export default class Profile extends React.Component {
     }
     
     _onPressFollow(){
-        /*
+        
 		db.collection('User')
       .find({ username: this.props.screenProps.user })
       .then(docs => {
+		  db.collection('User')
+      .find({ username: this.props.screenProps.guest }).then(docss=>{
         docs[0].profile.followers.includes(this.props.screenProps.guest)
-          ? (
-			  db.collection('User')
+	    ? (
+			docs[0].profile.followers.splice(docs[0].profile.followers.indexOf(this.props.screenProps.guest)),
+			docss[0].profile.follow.splice(docss[0].profile.follow.indexOf(this.props.screenProps.user)),
+		db.collection('User')
               .updateOne(
                 { username: this.props.screenProps.guest },
-                { $pull: { 'follow': this.props.screenProps.user } }
-              ).then(()=>
-			  db.collection('User')
-              .updateOne(
-                { username: this.props.screenProps.user },
-                { $set: { 'followers': this.props.screenProps.guest } }
-              )).then(() => this.props.screenProps.update())).then(()=>console.log('unfollowed'))
-          :(db.collection('User')
-      .find({ username: this.props.screenProps.guest }).then(docss=>
-			docs[0].profile.followers.push(this.props.screenProps.guest),
-			docss[0].profile.follow.push(this.props.screenProps.user),
-		    db.collection('User')
-              .updateOne(
-                { username: this.props.screenProps.guest },
-                { $set: { 'profile': docss[0],profile } },
+                { $set: { 'profile': docss[0].profile } },
 				()=>console.log('error')
               ).then(()=>
             db.collection('User')
@@ -202,10 +193,30 @@ export default class Profile extends React.Component {
                 { username: this.props.screenProps.user },
                 { $set: { 'profile': docs[0].profile } },
 				()=>console.log('error')
-              ))).then((ret) =>{console.log(ret);
-			  this.props.screenProps.update()})).then(()=>console.log('followed\n'))
-      });
-      */
+              )).then((ret) =>{
+			  this.props.screenProps.update()}).then(()=>console.log('unfollowed\n'))
+		
+		
+		
+		):(
+			docs[0].profile.followers.push(this.props.screenProps.guest),
+			docss[0].profile.follow.push(this.props.screenProps.user),
+		db.collection('User')
+              .updateOne(
+                { username: this.props.screenProps.guest },
+                { $set: { 'profile': docss[0].profile } },
+				()=>console.log('error')
+              ).then(()=>
+            db.collection('User')
+              .updateOne(
+                { username: this.props.screenProps.user },
+                { $set: { 'profile': docs[0].profile } },
+				()=>console.log('error')
+              )).then((ret) =>{
+			  this.props.screenProps.update()}).then(()=>console.log('followed\n'))
+		
+	      )})});
+      
     }
     
     render() {
@@ -230,7 +241,7 @@ export default class Profile extends React.Component {
                             style={styles.profilePicture}
                         />
                         {this.props.screenProps.guest=='' && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}> Change image</Text>}
-						{/* this.props.screenProps.guest!='' && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressFollow.bind(this)}>follow{this.props.screenProps.userData.followers.includes(this.props.screenProps.guest)?'ed':''}</Text> */}
+						{this.props.screenProps.guest!='' && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressFollow.bind(this)}>follow{this.props.screenProps.userData.followers.includes(this.props.screenProps.guest)?'ed':''}</Text> }
                     </View>
                     <View style={styles.profileInfo}>
                         <Text style={styles.profileName}>{this.props.screenProps.user}</Text>
@@ -289,13 +300,44 @@ export default class Profile extends React.Component {
                             >
                                 <MapView.Callout style={{ zIndex: 100000 }}>
                                     <ScrollView style={styles.callout}>
-                                        <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} />
+                                        <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} goToProfile={(user)=>{
+											db.collection('User')
+											  .find({ username: user})
+											  .then(docs => {(
+											  console.log(docs[0]),
+											this.setState({
+											profileData:docs[0].profile,goToProfile:user}))})
+										}}				  />
                                     </ScrollView>
                                 </MapView.Callout>
                             </MapView.Marker>
                         )}
                     </MapMarkerClustering>
                 </View>
+				{this.state.goToProfile!=''&&
+				  <View style={{
+				  position: 'absolute',
+				  flex: 1,
+				  zIndex: 1000,
+				  backgroundColor:'white',
+				  height: '100%',
+				  width: '100%'
+				  }}>
+				<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,callback:()=>{
+				this.setState({goToProfile:''})}
+					, guest:this.props.screenProps.guest
+					
+					, update:()=>{
+						db.collection('User')
+								  .find({ username: this.state.goToProfile})
+								  .then(docs => {(
+								  console.log(docs[0]),
+								this.setState({
+								profileData:docs[0].profile}))});
+								this.props.screenProps.callback()}
+								}}/>
+				</View>
+				}
             </View>
       );
     }
