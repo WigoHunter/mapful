@@ -170,7 +170,7 @@ export default class App extends React.Component {
               }
               backgroundColor="#1EE494"
           />
-          <RootTabs screenProps={{user: this.state.username,userData:this.state.userData,callback:this.update.bind(this), guest:false}} />
+          <RootTabs screenProps={{user: this.state.username,userData:this.state.userData,callback:this.update.bind(this), guest:''}} />
         </View>
       );
     }

@@ -7,6 +7,7 @@ import MapView from 'react-native-maps';
 import db from './utils/db.js';
 import MapMarkerClustering  from './MapMarkerClustering';
 import { Callout } from './Discover';
+import EditPin from './EditPin';
 
 var CryptoJS = require('crypto-js');
 
@@ -90,7 +91,8 @@ export default class Profile extends React.Component {
                 ? 'http://res.cloudinary.com/comp33302017/image/upload/v1510979878/213810-200_b0flgc.png'
                 : `https://res.cloudinary.com/comp33302017/image/upload/v${this.props.screenProps.userData.pic.version}/${this.props.screenProps.userData.pic.id}`,
             pins: [],
-		    goToProfile: ''
+		    goToProfile: '',
+			edit:null
         }
 
         this.uploadImage = this.uploadImage.bind(this);
@@ -300,14 +302,16 @@ export default class Profile extends React.Component {
                             >
                                 <MapView.Callout style={{ zIndex: 100000 }}>
                                     <ScrollView style={styles.callout}>
-                                        <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} goToProfile={(user)=>{
+                                        <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.guest==''?this.props.screenProps.user:this.props.screenProps.guest} userData={this.props.screenProps.userData} goToProfile={(user)=>{
 											db.collection('User')
 											  .find({ username: user})
 											  .then(docs => {(
 											  console.log(docs[0]),
 											this.setState({
 											profileData:docs[0].profile,goToProfile:user}))})
-										}}				  />
+										}}
+										editPin={()=>this.setState({edit:pin})}
+										/>
                                     </ScrollView>
                                 </MapView.Callout>
                             </MapView.Marker>
@@ -338,6 +342,17 @@ export default class Profile extends React.Component {
 								}}/>
 				</View>
 				}
+				{this.state.edit!=null&& <View style={{ 
+				  position: 'absolute',
+				  flex: 1,
+				  zIndex: 1000,
+				  backgroundColor:'white',
+				  height: '100%',
+				  width: '100%'
+				}}>
+				<EditPin pin={this.state.edit} callback={()=>
+				this.setState({edit:null})}/>		
+                </View>}
             </View>
       );
     }

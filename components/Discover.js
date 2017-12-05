@@ -8,6 +8,7 @@ import db from './utils/db.js';
 import { mapIdToProfilePicture } from './utils/utils.js';
 import DeferredImage from './DeferredRender.js';
 import Profile from './Profile.js'
+import EditPin from './EditPin';
 
 export default class Discover extends React.Component {
   static navigationOptions = {
@@ -133,12 +134,26 @@ export default class Discover extends React.Component {
 						  console.log(docs[0]),
 						this.setState({
 						profileData:docs[0].profile,goToProfile:user}))})
-					}}				  />
+					}}	
+					editPin={()=>this.setState({edit:pin})}
+					/>
                 </ScrollView>
               </MapView.Callout>
             </MapView.Marker>
           )}
         </MapMarkerClustering>
+		
+				{this.state.edit!=null&& <View style={{ 
+				  position: 'absolute',
+				  flex: 1,
+				  zIndex: 1000,
+				  backgroundColor:'white',
+				  height: '100%',
+				  width: '100%'
+				}}>
+				<EditPin pin={this.state.edit} callback={()=>
+				this.setState({edit:null})}/>		
+                </View>}
       </View>
   )
   }
@@ -213,8 +228,23 @@ export class Callout extends React.Component {
           </TouchableOpacity>
           <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => this.toggleComment()}>
             <Icon name="comment-o" style={{ marginRight: 3, fontSize: 14 }} />
-            <Text style={{ fontSize: 14 }}>{pin.comments.length}</Text>
+            <Text style={{marginRight: 14,fontSize: 14 }}>{pin.comments.length}</Text>
           </TouchableOpacity>
+		  {pin.username==user&&
+          <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => this.props.editPin()}>
+            <Icon name="pencil-square-o" style={{ marginRight: 3}} />
+          </TouchableOpacity>}
+           {pin.username==user&&
+		   <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' ,marginLeft: 14}} onPress={() => {
+			   db.collection('Pins').deleteOne( { _id : pin._id } ).then(() => {
+				this.props.updatePins();
+				})
+			}
+			   }>
+            <Icon name="trash-o" style={{ marginRight: 17, fontSize: 14 }} />
+          </TouchableOpacity>
+		  }
+		
         </View>
         {this.state.openComment &&
           <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>

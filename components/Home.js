@@ -44,7 +44,7 @@ export default class Home extends React.Component {
   // But again, the query for getting pins on Home and Discover will be different
   updatePins() {
     db.collection('Pins')
-      .find({})
+      .find({'username': { $in: this.props.screenProps.userData.follow}})
       .then(pins => this.setState({ pins: pins.reverse() }));
   }
 
@@ -53,7 +53,7 @@ export default class Home extends React.Component {
 
     return new Promise((resolve, reject) => {
       db.collection('Pins')
-        .find({})
+        .find({'username': { $in: this.props.screenProps.userData.follow}})
         .then(pins => {
           self.setState({ pins: pins.reverse() });
           resolve("success");

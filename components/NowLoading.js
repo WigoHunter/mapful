@@ -19,7 +19,7 @@ const NowLoading = () => (
 			borderColor: 'gray',
 			borderRadius: 3
 		}}>
-			Now Loading...
+			Connecting to the server, please wait...
 		</Text>
 	</View>
 )
