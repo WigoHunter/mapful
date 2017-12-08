@@ -8,6 +8,8 @@ import db from './utils/db.js';
 import MapMarkerClustering  from './MapMarkerClustering';
 import { Callout } from './Discover';
 import EditPin from './EditPin';
+import UserList from './UserList';
+import Prompt from 'react-native-prompt';
 
 var CryptoJS = require('crypto-js');
 
@@ -92,7 +94,10 @@ export default class Profile extends React.Component {
                 : `https://res.cloudinary.com/comp33302017/image/upload/v${this.props.screenProps.userData.pic.version}/${this.props.screenProps.userData.pic.id}`,
             pins: [],
 		    goToProfile: '',
-			edit:null
+			edit:null,
+			showFollower:false,
+			showFollowing:false,
+			promptVisible:false
         }
 
         this.uploadImage = this.uploadImage.bind(this);
@@ -116,19 +121,19 @@ export default class Profile extends React.Component {
         db.collection('Pins')
           .find({ _id: id })
           .then(docs => {
-            docs[0].likes.includes(this.props.screenProps.user)
+            docs[0].likes.includes(this.props.screenProps.guest)
               ? 
                 db.collection('Pins')
                   .updateOne(
                     { _id: id },
-                    { $pull: { 'likes': this.props.screenProps.user } }
+                    { $pull: { 'likes': this.props.screenProps.guest } }
                   )
                   .then(() => this.updatePins())
               :
                 db.collection('Pins')
                   .updateOne(
                     { _id: id },
-                    { $addToSet: { 'likes': this.props.screenProps.user } }
+                    { $addToSet: { 'likes': this.props.screenProps.guest } }
                   )
                   .then(() => this.updatePins())
           });
@@ -182,8 +187,8 @@ export default class Profile extends React.Component {
       .find({ username: this.props.screenProps.guest }).then(docss=>{
         docs[0].profile.followers.includes(this.props.screenProps.guest)
 	    ? (
-			docs[0].profile.followers.splice(docs[0].profile.followers.indexOf(this.props.screenProps.guest)),
-			docss[0].profile.follow.splice(docss[0].profile.follow.indexOf(this.props.screenProps.user)),
+			docs[0].profile.followers.splice(docs[0].profile.followers.indexOf(this.props.screenProps.guest),1),
+			docss[0].profile.follow.splice(docss[0].profile.follow.indexOf(this.props.screenProps.user),1),
 		db.collection('User')
               .updateOne(
                 { username: this.props.screenProps.guest },
@@ -196,7 +201,7 @@ export default class Profile extends React.Component {
                 { $set: { 'profile': docs[0].profile } },
 				()=>console.log('error')
               )).then((ret) =>{
-			  this.props.screenProps.update()}).then(()=>console.log('unfollowed\n'))
+			  this.props.screenProps.callback()}).then(()=>console.log('unfollowed\n'))
 		
 		
 		
@@ -215,25 +220,46 @@ export default class Profile extends React.Component {
                 { $set: { 'profile': docs[0].profile } },
 				()=>console.log('error')
               )).then((ret) =>{
-			  this.props.screenProps.update()}).then(()=>console.log('followed\n'))
+			  this.props.screenProps.callback()}).then(()=>console.log('followed\n'))
 		
 	      )})});
       
     }
-    
     render() {
         const { pic, pins } = this.state;
 
         return (
+		
             <View style={{ flex: 1, flexDirection: 'column' }}>
-				{this.props.screenProps.guest!="" && <View style={{ 
+				<Prompt
+					title="Write down something about you"
+					placeholder=""
+					defaultValue={this.props.screenProps.userData.intro}
+					visible={ this.state.promptVisible }
+					onCancel={ () => this.setState({
+					  promptVisible: false,
+					}) }
+					onSubmit={ (value) =>{
+					this.setState({promptVisible: false})
+					var tem = this.props.screenProps.userData
+					if(tem.intro==value)return;
+					tem.intro=value
+					db.collection('User')
+					  .updateOne(
+						{ username: this.props.screenProps.user },
+						{ $set: { 'profile': tem } },
+						()=>console.log('error')
+					  ).then((ret) =>{
+					this.props.screenProps.callback()})}
+					}/>
+				{this.props.screenProps.back != null && <View style={{ 
 				  position: 'absolute',
 				  zIndex: 100,
 				  top: 0,
 				  left: 0
 				}}>
                 <TouchableOpacity>
-                    <Icon2 name="arrow-back" color="black" size={30} onPress= {()=>this.props.screenProps.callback()}/>
+                    <Icon2 name="arrow-back" color="black" size={30} onPress= {()=>this.props.screenProps.back()}/>
                 </TouchableOpacity>				
                 </View>}
                 <View style={{flex : 0.4, flexDirection: 'row', alignItems: 'center'}}>
@@ -242,8 +268,8 @@ export default class Profile extends React.Component {
                             source={{uri: pic}}
                             style={styles.profilePicture}
                         />
-                        {this.props.screenProps.guest=='' && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}> Change image</Text>}
-						{this.props.screenProps.guest!='' && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressFollow.bind(this)}>follow{this.props.screenProps.userData.followers.includes(this.props.screenProps.guest)?'ed':''}</Text> }
+                        {this.props.screenProps.guest==this.props.screenProps.user&& <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressUploadImg.bind(this)}> Change image</Text>}
+						{this.props.screenProps.guest!=this.props.screenProps.user && <Text style={{color:'grey', alignSelf:'center', marginTop:'8%'}} onPress={this._onPressFollow.bind(this)}>follow{this.props.screenProps.userData.followers.includes(this.props.screenProps.guest)?'ed':''}</Text> }
                     </View>
                     <View style={styles.profileInfo}>
                         <Text style={styles.profileName}>{this.props.screenProps.user}</Text>
@@ -253,15 +279,22 @@ export default class Profile extends React.Component {
                                 <Text style={styles.pins}>Pins</Text>
                             </View>
                             <View style={styles.block}>
-                                <Text style={styles.categoryAmount}>{this.props.screenProps.userData.followers.length}</Text>
+                                <Text style={styles.categoryAmount} onPress={()=>this.setState({showFollower:true})}>{this.props.screenProps.userData.followers.length}</Text>
                                 <Text style={styles.follows}>Followers</Text>
                             </View>
                             <View style={styles.block}>
-                                <Text style={styles.categoryAmount}>{this.props.screenProps.userData.follow.length}</Text>
+                                <Text style={styles.categoryAmount} onPress={()=>this.setState({showFollowing:true})}>{this.props.screenProps.userData.follow.length}</Text>
                                 <Text style={styles.follows}>Following</Text>
                             </View>
                             <View style={styles.bio}>
-                                <Text>{this.props.screenProps.userData.intro}</Text>
+								{this.props.screenProps.guest!=this.props.screenProps.user?(
+									<Text style = {{color:this.props.screenProps.userData.intro==''?'#ddd':'#000'}}>
+										{this.props.screenProps.userData.intro==''?'Nothing is written':this.props.screenProps.userData.intro}
+									</Text>):(
+									<Text style = {{color:this.props.screenProps.userData.intro==''?'#ddd':'#000'}} onPress={()=>this.setState({promptVisible:true})}>
+										{this.props.screenProps.userData.intro==''?'Write down something about you!':this.props.screenProps.userData.intro}
+									</Text>)
+								}
                             </View>
                         </View>
                     </View>
@@ -302,7 +335,7 @@ export default class Profile extends React.Component {
                             >
                                 <MapView.Callout style={{ zIndex: 100000 }}>
                                     <ScrollView style={styles.callout}>
-                                        <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.guest==''?this.props.screenProps.user:this.props.screenProps.guest} userData={this.props.screenProps.userData} goToProfile={(user)=>{
+                                        <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.guest} userData={this.props.screenProps.userData} goToProfile={(user)=>{
 											db.collection('User')
 											  .find({ username: user})
 											  .then(docs => {(
@@ -327,11 +360,11 @@ export default class Profile extends React.Component {
 				  height: '100%',
 				  width: '100%'
 				  }}>
-				<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,callback:()=>{
+				<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,back:()=>{
 				this.setState({goToProfile:''})}
 					, guest:this.props.screenProps.guest
 					
-					, update:()=>{
+					, callback:()=>{
 						db.collection('User')
 								  .find({ username: this.state.goToProfile})
 								  .then(docs => {(
@@ -352,6 +385,32 @@ export default class Profile extends React.Component {
 				}}>
 				<EditPin pin={this.state.edit} callback={()=>
 				this.setState({edit:null})}/>		
+                </View>}
+				{this.state.showFollower&& <View style={{ 
+				  position: 'absolute',
+				  flex: 1,
+				  zIndex: 1000,
+				  backgroundColor:'white',
+				  height: '100%',
+				  width: '100%'
+				}}>
+				<UserList title = 'followers' list={this.props.screenProps.userData.followers} user={this.props.screenProps.guest}
+				back={()=>
+				this.setState({showFollower:false})}
+				callback= {()=>{this.props.screenProps.callback()}}/>		
+                </View>}
+				{this.state.showFollowing&& <View style={{ 
+				  position: 'absolute',
+				  flex: 1,
+				  zIndex: 1000,
+				  backgroundColor:'white',
+				  height: '100%',
+				  width: '100%'
+				}}>
+				<UserList title = 'following' list={this.props.screenProps.userData.follow} user={this.props.screenProps.guest} back={()=>
+				this.setState({showFollowing:false})}
+				callback= {()=>{this.props.screenProps.callback()}
+				}/>		
                 </View>}
             </View>
       );

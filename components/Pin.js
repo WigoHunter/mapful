@@ -322,7 +322,9 @@ export default class Pin extends React.Component {
 			  top: 10,
 			  left: 10
 			}}>
-				<Button style={{width:10}} onPress= {()=>this.setState({map:false})}	title="Back"/>
+					<TouchableOpacity>
+						<Icon2 name="arrow-back" color="black" size={30} onPress= {()=>this.setState({map:false})}/>
+					</TouchableOpacity>	
 			</View>
 			<View style={{ 
 				

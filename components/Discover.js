@@ -77,19 +77,19 @@ export default class Discover extends React.Component {
 		  height: '100%',
 		  width: '100%'
 		  }}>
-		<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,callback:()=>{
-		this.setState({goToProfile:''})}
-			, guest:this.props.screenProps.user
-			
-			, update:()=>{
-				db.collection('User')
-						  .find({ username: this.state.goToProfile})
-						  .then(docs => {(
-						  console.log(docs[0]),
-						this.setState({
-						profileData:docs[0].profile}))});
-						this.props.screenProps.callback()}
-						}}/>
+		<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,back:()=>{
+				this.setState({goToProfile:''})}
+					, guest:this.props.screenProps.guest
+					
+					, callback:()=>{
+						db.collection('User')
+								  .find({ username: this.state.goToProfile})
+								  .then(docs => {(
+								  console.log(docs[0]),
+								this.setState({
+								profileData:docs[0].profile}))});
+								this.props.screenProps.callback()}
+								}}/>
 		</View>
 		}
         <View style={{
