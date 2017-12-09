@@ -75,7 +75,7 @@ export default class UserList extends React.Component {
 						flexDirection: 'column',
 						backgroundColor: '#EFEFEF',
 					  }}
-					name="lazyload-scrollview">
+					name={"lazyload-scrollview"+new Date().toDateString()}>
 						{this.props.list.map(name => (
 						  <ListItem
 							key={name}

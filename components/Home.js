@@ -9,6 +9,65 @@ import { mapIdToProfilePicture } from './utils/utils.js';
 import DeferredImage from './DeferredRender.js';
 import Profile from './Profile.js'
 
+const styles = StyleSheet.create({
+  home: {
+    flex: 1,
+    flexDirection: 'column',
+    backgroundColor: '#EFEFEF',
+  },
+
+  pin: {
+    backgroundColor: '#FFF',
+    flexDirection: 'column',
+    alignSelf: 'stretch',
+    margin: 5,
+    borderRadius: 6,
+    padding: 8,
+  },
+  
+  title: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginBottom: 3,
+    marginTop: 8,
+  },
+
+  username: {
+    fontSize: 14,
+    color: '#1EE494',
+  },
+
+  time: {
+    fontSize: 12,
+    color: '#AAA',
+    marginLeft: 8
+  },
+
+  img: {
+    alignSelf: 'stretch',
+    marginTop: 10,
+    marginBottom: 10,
+    minHeight: 260,
+    borderRadius: 4,
+  },
+
+  txt: {
+    fontSize: 14,
+    fontWeight: 'normal',
+    alignSelf: 'stretch',
+  },
+
+  comment: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'stretch',
+    marginBottom: 8
+  },
+
+  commentText: {
+    fontSize: 14
+  }
+});
 export default class Home extends React.Component {
 	static navigationOptions = {
     tabBarLabel: 'Home'
@@ -43,17 +102,21 @@ export default class Home extends React.Component {
   // Same as updatePins() -> Should probably use Redux store for pins
   // But again, the query for getting pins on Home and Discover will be different
   updatePins() {
+	  var tem = this.props.screenProps.userData.follow.slice(0)
+	  tem.push(this.props.screenProps.user)
     db.collection('Pins')
-      .find({'username': { $in: this.props.screenProps.userData.follow}})
+      .find({'username': { $in:tem}})
       .then(pins => this.setState({ pins: pins.reverse() }));
   }
 
   updatePinsWithPromise() {
     const self = this;
+	  var tem = this.props.screenProps.userData.follow.slice(0)
 
+	  tem.push(this.props.screenProps.user)
     return new Promise((resolve, reject) => {
       db.collection('Pins')
-        .find({'username': { $in: this.props.screenProps.userData.follow}})
+        .find({'username': { $in:tem}})
         .then(pins => {
           self.setState({ pins: pins.reverse() });
           resolve("success");
@@ -175,11 +238,6 @@ class Post extends React.Component {
       .then(() => this.textInput.clear());
   }
 
-  destoryPins() {
-  }
-
-  destoryUsers() {
-  }
 
   render() {
     const { host, pin, likePin, user, submitComment } = this.props;
@@ -252,63 +310,3 @@ class Post extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  home: {
-    flex: 1,
-    flexDirection: 'column',
-    backgroundColor: '#EFEFEF',
-  },
-
-  pin: {
-    backgroundColor: '#FFF',
-    flexDirection: 'column',
-    alignSelf: 'stretch',
-    margin: 5,
-    borderRadius: 6,
-    padding: 8,
-  },
-  
-  title: {
-    fontWeight: 'bold',
-    fontSize: 16,
-    marginBottom: 3,
-    marginTop: 8,
-  },
-
-  username: {
-    fontSize: 14,
-    color: '#1EE494',
-  },
-
-  time: {
-    fontSize: 12,
-    color: '#AAA',
-    marginLeft: 8
-  },
-
-  img: {
-    alignSelf: 'stretch',
-    marginTop: 10,
-    marginBottom: 10,
-    minHeight: 260,
-    borderRadius: 4,
-  },
-
-  txt: {
-    fontSize: 14,
-    fontWeight: 'normal',
-    alignSelf: 'stretch',
-  },
-
-  comment: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    marginBottom: 8
-  },
-
-  commentText: {
-    fontSize: 14
-  }
-});

@@ -11,6 +11,7 @@ import Pin from './components/Pin.js';
 import db from './components/utils/db.js';
 import NowLoading from './components/NowLoading.js';
 
+//Defining the navigation bar
 const RootTabs = TabNavigator({
   Home: {
     screen: Home,
@@ -49,7 +50,17 @@ const RootTabs = TabNavigator({
     activeTintColor: '#1EE494',
   },
 });
-  
+const styles = StyleSheet.create({
+  input: {
+    borderRadius: 100,
+    marginLeft: 20,
+    width: 150,
+    height: 32,
+    borderColor: '#FFF',
+    borderWidth: 1,
+    paddingLeft: 10
+  }
+})
 export default class App extends React.Component {
   constructor(props) {
 		super(props);
@@ -61,6 +72,7 @@ export default class App extends React.Component {
 		  loading: false
 		};
   }
+  //update the profile status
   update() {
 	  console.log('receivecallback');
 	db.collection('User')
@@ -177,14 +189,3 @@ export default class App extends React.Component {
   }
 }
 
-const styles = StyleSheet.create({
-  input: {
-    borderRadius: 100,
-    marginLeft: 20,
-    width: 150,
-    height: 32,
-    borderColor: '#FFF',
-    borderWidth: 1,
-    paddingLeft: 10
-  }
-})
