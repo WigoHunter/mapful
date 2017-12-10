@@ -116,7 +116,7 @@ export default class Home extends React.Component {
 	  tem.push(this.props.screenProps.user)
     return new Promise((resolve, reject) => {
       db.collection('Pins')
-        .find({'username': { $in:tem}})
+        .find({'username': { $in:tem }})
         .then(pins => {
           self.setState({ pins: pins.reverse() });
           resolve("success");

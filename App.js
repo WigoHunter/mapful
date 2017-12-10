@@ -112,7 +112,7 @@ export default class App extends React.Component {
                       profile: {
                         pic: {version:'1510979878',id:'213810-200_b0flgc'},
                         intro: '',
-                        follow: [],
+                        follow: ["Wigo", "ozzyulger"],
                         followers: [],
                       }
                     })
