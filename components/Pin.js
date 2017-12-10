@@ -165,9 +165,8 @@ export default class Pin extends React.Component {
 		  let xhr = new XMLHttpRequest();
 		  xhr.open('POST', upload_url);
 		  xhr.onload = () => {
-			var res=JSON.parse(xhr._response);
-			console.log(xhr._response);
-			var tem ={
+			var res = JSON.parse(xhr._response);
+			var tem = {
 				version:res.version,
 				id:res.public_id
 			}
@@ -180,174 +179,174 @@ export default class Pin extends React.Component {
 		  formdata.append('signature', signature);
 		  xhr.send(formdata);
 	}
+
 	_onPressCurrentLocation() {
 		const Options = {
-		enableHighAccuracy: true,
-		timeout: 5000,
-		maximumAge: 0
+			enableHighAccuracy: true,
+			timeout: 5000,
+			maximumAge: 0
 		};
 		navigator.geolocation.getCurrentPosition(function success(pos) {
 			var crd = pos.coords;
-			console.log('Your current position is:');
-			console.log(`Latitude : ${crd.latitude}`);
-			console.log(`Longitude: ${crd.longitude}`);
-			console.log(`More or less ${crd.accuracy} meters.`);
 			this.setState({location:pos.coords})
-			}.bind(this), function error(err) {
+		}.bind(this), function error(err) {
 			console.warn(`ERROR(${err.code}): ${err.message}`);
 			Alert.alert('Cannot get your location information!')
-			}, Options);
+		}, Options);
 	}
+
 	_onPressLocationOnMap() {
-	this.setState({map:true});
+		this.setState({map:true});
 	}
+
 	async _onPressUploadImg() {
-			var res=await Expo.ImagePicker.launchImageLibraryAsync({base64:true});
-			if(res.cancelled==false){
-				this.setState({img:[...this.state.img, {path:res.uri,base64:res.base64}],numImg:(this.state.numImg+1)})
-			}
+		var res=await Expo.ImagePicker.launchImageLibraryAsync({base64:true});
+		if(res.cancelled==false){
+			this.setState({img:[...this.state.img, {path:res.uri,base64:res.base64}],numImg:(this.state.numImg+1)})
+		}
 	}
+
 	 _onPressPin() {
 		if(this.state.title==''){
 			Alert.alert('Title/Text cannot be empty!');
 			return;
 		}
-		this.setState({loading:true});
+
+		this.setState({ loading: true });
 		if(this.state.numImg>0){
-			console.log('start uploading images');
-			{this.state.img.map(async (obj,i) =>{
-						var url= 'data:image/jpeg;base64,'+obj.base64
-						this.uploadImage(url)
-			}
-			)}
-			console.log('uploading finished, waiting for response from the server');
+			{this.state.img.map(async (obj,i) => {
+				var url= 'data:image/jpeg;base64,'+obj.base64
+				this.uploadImage(url)
+			})}
 		}
+
 		var error=false;
 		var tid = setInterval(function(){
 			if(this.state.imgArr.length>=this.state.img.length){
 				clearInterval(tid);
-				console.log('start uploading data');
-				console.log(this.state.imgArr);
-				db.collection('Pins').insert({
-					username: this.props.screenProps.user,
-					txt:this.state.txt, 
-					title:this.state.title, 
-					location:this.state.location,
-					time:new Date(),
-					comments:[],
-					likes: [],
-					image:this.state.imgArr}).catch(err => {console.error(err),
-					error=true;
-			})
+				db.collection('Pins')
+					.insert({
+						username: this.props.screenProps.user,
+						txt:this.state.txt, 
+						title:this.state.title, 
+						location:this.state.location,
+						time:new Date(),
+						comments:[],
+						likes: [],
+						image:this.state.imgArr
+					}).catch(err => {
+						console.error(err);
+						error=true;
+					})
 		
-			if(error){
-				Alert.alert('error!');
-				return;
-			}
-			this.setState({imgArr:[],numImg:0,img:[],txt:'',title:'',loading:false});
-			Alert.alert('Pin is shared!');
-			}
-				
+				if(error){
+					Alert.alert('error!');
+					return;
+				}
+
+				this.setState({imgArr:[],numImg:0,img:[],txt:'',title:'',loading:false});
+				Alert.alert('Pin is shared!');
+			}	
 		}.bind(this) ,1000);
-		
 	}
+
     render() {
-    const { loading } = this.state;
-	  if(this.state.map==false)
-      return (
-        <View style={{ flex: 1, flexDirection: 'column' }}>
-			{loading && <NowLoading/>}
-				<Text style={styles.newpost}>
-	        		Share new pin
-	        	</Text>
-				<View style={{ flex: 1, flexDirection: 'row'}}>
-	        		<TouchableOpacity style={styles.addbox} onPress={this._onPressUploadImg.bind(this)}>
-	        			<Icon name="plus" color="black" size={40}/>
-	        		</TouchableOpacity>
-	        		<TextInput style={styles.title}  placeholder="Write a title..." onChangeText={(title) => this.setState({title})} value = {this.state.title}/>
-        		</View>
-        		<TextInput textAlignVertical='top' multiline={true} style={styles.caption}  placeholder="Write a caption..." onChangeText={(txt) => this.setState({txt})} value = {this.state.txt}/>
-	        	<TouchableOpacity style={styles.mylocation} onPress={this._onPressCurrentLocation.bind(this)}>
-		        		<Icon2 name="my-location" color="black" size={40}/>
-	        	</TouchableOpacity>
-	        	<TouchableOpacity style={styles.pinlocation} onPress={this._onPressLocationOnMap.bind(this)}>
-	        		<Icon2 name="location-on" color="red" size={40}/>
-	        	</TouchableOpacity>
-	        	<TouchableOpacity style={styles.sharepin} onPress={this._onPressPin.bind(this)}>
-					<Text style={{fontWeight:'bold', color:'#1EE494'}}>Share</Text>
-	        	</TouchableOpacity>
-				<View style={styles.picture}>
-					{this.state.img.map((obj,i) =>
-						<View key={i}>
-						<Image key={i+1000} source={{uri:obj.path}} style={{height:160,width:216,}}/>
-						<TouchableOpacity key={i-2000} style={styles.delete} onPress={()=>{
-						  var array = this.state.img;
-						  array.splice(i, 1);
-						  this.setState({img: array,numImg:this.state.numImg-1});
-						  }}>
-						  <Icon name="remove" color="black" size={40}/>
+    	const { loading } = this.state;
+	  	if(this.state.map==false)
+      		return (
+				<View style={{ flex: 1, flexDirection: 'column' }}>
+					{loading && <NowLoading/>}
+					<Text style={styles.newpost}>
+						Share new pin
+					</Text>
+					<View style={{ flex: 1, flexDirection: 'row'}}>
+						<TouchableOpacity style={styles.addbox} onPress={this._onPressUploadImg.bind(this)}>
+							<Icon name="plus" color="black" size={40}/>
 						</TouchableOpacity>
-						</View>
-					  )}
+						<TextInput style={styles.title}  placeholder="Write a title..." onChangeText={(title) => this.setState({title})} value = {this.state.title}/>
+					</View>
+					<TextInput textAlignVertical='top' multiline={true} style={styles.caption}  placeholder="Write a caption..." onChangeText={(txt) => this.setState({txt})} value = {this.state.txt}/>
+					<TouchableOpacity style={styles.mylocation} onPress={this._onPressCurrentLocation.bind(this)}>
+							<Icon2 name="my-location" color="black" size={40}/>
+					</TouchableOpacity>
+					<TouchableOpacity style={styles.pinlocation} onPress={this._onPressLocationOnMap.bind(this)}>
+						<Icon2 name="location-on" color="red" size={40}/>
+					</TouchableOpacity>
+					<TouchableOpacity style={styles.sharepin} onPress={this._onPressPin.bind(this)}>
+						<Text style={{fontWeight:'bold', color:'#1EE494'}}>Share</Text>
+					</TouchableOpacity>
+					<View style={styles.picture}>
+						{this.state.img.map((obj,i) =>
+							<View key={i}>
+							<Image key={i+1000} source={{uri:obj.path}} style={{height:160,width:216,}}/>
+							<TouchableOpacity key={i-2000} style={styles.delete} onPress={()=>{
+							var array = this.state.img;
+							array.splice(i, 1);
+							this.setState({img: array,numImg:this.state.numImg-1});
+							}}>
+							<Icon name="remove" color="black" size={40}/>
+							</TouchableOpacity>
+							</View>
+						)}
+					</View>
 				</View>
-		</View>
-      );
-	  return (
-	 
-        <View style={{ flex: 1, flexDirection: 'column' }}>
-            <MapView
-                style={{ flex: 1 }}
-                initialRegion={{
-                    latitude: this.state.location.latitude,
-                    longitude: this.state.location.longitude,
-                    latitudeDelta: 0.5,
-                    longitudeDelta: 0.5,
-                }}
-				onPress = {(e) => 
-					this.setState({location:e.nativeEvent.coordinate})
-					}
-            >
-				<MapView.Marker
-				  coordinate={{
-					latitude: this.state.location.latitude,
-					longitude: this.state.location.longitude
-				  }}
+      		);
+			  
+		return (
+			<View style={{ flex: 1, flexDirection: 'column' }}>
+				<MapView
+					style={{ flex: 1 }}
+					initialRegion={{
+						latitude: this.state.location.latitude,
+						longitude: this.state.location.longitude,
+						latitudeDelta: 0.5,
+						longitudeDelta: 0.5,
+					}}
+					onPress = {(e) => 
+						this.setState({location:e.nativeEvent.coordinate})
+						}
 				>
-				  <Marker />
-				</MapView.Marker>
-			</MapView>
-			<View style={{ 
-			  position: 'absolute',
-			  zIndex: 100,
-			  top: 10,
-			  left: 10
-			}}>
-					<TouchableOpacity>
-						<Icon2 name="arrow-back" color="black" size={30} onPress= {()=>this.setState({map:false})}/>
-					</TouchableOpacity>	
+					<MapView.Marker
+					coordinate={{
+						latitude: this.state.location.latitude,
+						longitude: this.state.location.longitude
+					}}
+					>
+					<Marker />
+					</MapView.Marker>
+				</MapView>
+				<View style={{ 
+				position: 'absolute',
+				zIndex: 100,
+				top: 10,
+				left: 10
+				}}>
+						<TouchableOpacity>
+							<Icon2 name="arrow-back" color="black" size={30} onPress= {()=>this.setState({map:false})}/>
+						</TouchableOpacity>	
+				</View>
+				<View style={{ 
+					
+				position: 'absolute',
+				zIndex: 100,
+				top: 60,
+				alignSelf: 'center'
+				}}>
+					<Text style = {{color:'green'}}>Choose a place on the map</Text>
+				</View>
+				<View style={{
+				position: 'absolute',
+				zIndex: 100,
+				bottom: 50,
+				alignSelf: 'center'
+				}}>
+					<Text style={{borderColor: '#FFFFFF',
+								borderWidth: 1,
+								borderRadius: 110,
+								backgroundColor: '#FFFFFF'}}>
+						latitude:{this.state.location.latitude.toFixed(3)} longitude:{this.state.location.longitude.toFixed(3)}</Text>
+				</View>
 			</View>
-			<View style={{ 
-				
-			  position: 'absolute',
-			  zIndex: 100,
-			  top: 60,
-			  alignSelf: 'center'
-			}}>
-				<Text style = {{color:'green'}}>Choose a place on the map</Text>
-			</View>
-			<View style={{
-			  position: 'absolute',
-			  zIndex: 100,
-			  bottom: 50,
-			  alignSelf: 'center'
-			}}>
-				<Text style={{borderColor: '#FFFFFF',
-							  borderWidth: 1,
-							  borderRadius: 110,
-							  backgroundColor: '#FFFFFF'}}>
-					latitude:{this.state.location.latitude.toFixed(3)} longitude:{this.state.location.longitude.toFixed(3)}</Text>
-			</View>
-        </View>
-	  )
+		)
     }
 }

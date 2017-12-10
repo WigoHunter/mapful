@@ -66,32 +66,34 @@ export default class Discover extends React.Component {
 
   render() {
     const { region, pins } = this.state;
+
     return (
       <View style={{ flex: 1 }}>
-		  {this.state.goToProfile!=''&&
-		  <View style={{
-          position: 'absolute',
-		  flex: 1,
-          zIndex: 1000,
-		  backgroundColor:'white',
-		  height: '100%',
-		  width: '100%'
-		  }}>
-		<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,back:()=>{
-				this.setState({goToProfile:''})}
-					, guest:this.props.screenProps.guest
-					
-					, callback:()=>{
-						db.collection('User')
-								  .find({ username: this.state.goToProfile})
-								  .then(docs => {(
-								  console.log(docs[0]),
-								this.setState({
-								profileData:docs[0].profile}))});
-								this.props.screenProps.callback()}
-								}}/>
-		</View>
-		}
+        {this.state.goToProfile!=''&&
+          <View style={{
+              position: 'absolute',
+              flex: 1,
+              zIndex: 1000,
+              backgroundColor:'white',
+              height: '100%',
+              width: '100%'
+          }}>
+            <Profile screenProps={{
+                user: this.state.goToProfile,
+                userData:this.state.profileData,
+                back:() => {
+                  this.setState({goToProfile:''})
+                },
+                guest:this.props.screenProps.guest,
+                callback: () => {
+                    db.collection('User')
+                        .find({ username: this.state.goToProfile})
+                        .then(docs => this.setState({ profileData:docs[0].profile }));
+                    this.props.screenProps.callback()
+                }
+            }}/>
+		      </View>
+		    }
         <View style={{
           position: 'absolute',
           zIndex: 100,
@@ -126,36 +128,42 @@ export default class Discover extends React.Component {
             >
               <MapView.Callout style={{ zIndex: 100000 }}>
                 <ScrollView style={styles.callout}>
-                  <Callout pin={pin} updatePins={this.updatePins} likePin={this.likePin} user={this.props.screenProps.user} userData={this.props.screenProps.userData} 
-					goToProfile={(user)=>{
-						db.collection('User')
-						  .find({ username: user})
-						  .then(docs => {(
-						  console.log(docs[0]),
-						this.setState({
-						profileData:docs[0].profile,goToProfile:user}))})
-					}}	
-					editPin={()=>this.setState({edit:pin})}
-					/>
+                  <Callout
+                    pin={pin}
+                    updatePins={this.updatePins}
+                    likePin={this.likePin}
+                    user={this.props.screenProps.user}
+                    userData={this.props.screenProps.userData} 
+					          goToProfile={user => {
+                      db.collection('User')
+                        .find({ username: user})
+                        .then(docs => this.setState({ profileData: docs[0].profile, goToProfile: user}))
+                    }}	
+					          editPin={()=>this.setState({edit:pin})}
+					        />
                 </ScrollView>
               </MapView.Callout>
             </MapView.Marker>
           )}
         </MapMarkerClustering>
 		
-				{this.state.edit!=null&& <View style={{ 
-				  position: 'absolute',
-				  flex: 1,
-				  zIndex: 1000,
-				  backgroundColor:'white',
-				  height: '100%',
-				  width: '100%'
-				}}>
-				<EditPin pin={this.state.edit} callback={()=>
-				this.setState({edit:null})}/>		
-                </View>}
+				{this.state.edit!=null &&
+          <View style={{ 
+            position: 'absolute',
+            flex: 1,
+            zIndex: 1000,
+            backgroundColor:'white',
+            height: '100%',
+            width: '100%'
+          }}>
+				    <EditPin
+              pin={this.state.edit}
+              callback={() => this.setState({edit:null})}
+            />		
+          </View>
+        }
       </View>
-  )
+    )
   }
 }
 
@@ -230,38 +238,40 @@ export class Callout extends React.Component {
             <Icon name="comment-o" style={{ marginRight: 3, fontSize: 14 }} />
             <Text style={{marginRight: 14,fontSize: 14 }}>{pin.comments.length}</Text>
           </TouchableOpacity>
-		  {pin.username==user&&
-          <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => this.props.editPin()}>
-            <Icon name="pencil-square-o" style={{ marginRight: 3}} />
-          </TouchableOpacity>}
-           {pin.username==user&&
-		   <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' ,marginLeft: 14}} onPress={() => {
-			   db.collection('Pins').deleteOne( { _id : pin._id } ).then(() => {
-				this.props.updatePins();
-				})
-			}
-			   }>
-            <Icon name="trash-o" style={{ marginRight: 17, fontSize: 14 }} />
-          </TouchableOpacity>
-		  }
-		
+		      {pin.username==user &&
+            <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => this.props.editPin()}>
+              <Icon name="pencil-square-o" style={{ marginRight: 3}} />
+            </TouchableOpacity>
+          }
+          {pin.username==user &&
+            <TouchableOpacity
+              style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 14}}
+              onPress={() => {
+                db.collection('Pins').deleteOne( { _id : pin._id } ).then(() => {
+                  this.props.updatePins();
+                })
+              }
+			      }>
+              <Icon name="trash-o" style={{ marginRight: 17, fontSize: 14 }} />
+            </TouchableOpacity>
+          }
         </View>
+
         {this.state.openComment &&
           <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
             {pin.comments.map((comment, i) => (
               <View style={styles.comment} key={i}>
-                <TouchableOpacity
-				  onPress= {()=>this.props.goToProfile(comment.user)}>
-                <DeferredImage
-                  promise={mapIdToProfilePicture(comment.user)}
-                  then={<View style={{ width: 20, height: 20 }} />}
-                  style={{
-                    height: 20,
-                    width: 20,
-                    borderRadius: 10,
-                    marginRight: 3
-                  }}
-                />
+                <TouchableOpacity onPress= {()=>this.props.goToProfile(comment.user)}>
+                  <DeferredImage
+                    promise={mapIdToProfilePicture(comment.user)}
+                    then={<View style={{ width: 20, height: 20 }} />}
+                    style={{
+                      height: 20,
+                      width: 20,
+                      borderRadius: 10,
+                      marginRight: 3
+                    }}
+                  />
                 </TouchableOpacity>	
                 <Text>{comment.txt}</Text>
               </View>

@@ -212,7 +212,6 @@ export default class MapMarkerClustering extends Component {
             </MapView>
         );
     }
-
 }
 
 MapMarkerClustering.defaultProps = {

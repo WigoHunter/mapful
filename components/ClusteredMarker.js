@@ -64,7 +64,8 @@ export default class CustomMarker extends Component {
                 array.push(childMarker.props.children.props.children.props.children);
                 this.dig(childMarker,array);
 			})
-		}
+        }
+        
 		if(child.belly!=null){
 			child.belly.forEach((childMarker)=>{
                 array.push(childMarker.props.children.props.children.props.children);

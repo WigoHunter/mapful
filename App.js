@@ -50,6 +50,7 @@ const RootTabs = TabNavigator({
     activeTintColor: '#1EE494',
   },
 });
+
 const styles = StyleSheet.create({
   input: {
     borderRadius: 100,
@@ -61,6 +62,7 @@ const styles = StyleSheet.create({
     paddingLeft: 10
   }
 })
+
 export default class App extends React.Component {
   constructor(props) {
 		super(props);
@@ -74,21 +76,21 @@ export default class App extends React.Component {
   }
   //update the profile status
   update() {
-	  console.log('receivecallback');
-	db.collection('User')
+	  db.collection('User')
       .find({ username: this.state.username, pass: this.state.pass })
       .then(docs => {(this.setState({userData:docs[0].profile}))})
   }
+
 	_onPressLogin() {
-	this.setState({loading:true});
-    db.collection('User')
-      .find({ username: this.state.username, pass: this.state.pass })
-      .then(docs => {
-		  this.setState({loading:false});
-		  docs.length
-        ? (this.setState({isLoggedIn:true,userData:docs[0].profile}),console.log(this.state))
-        : (Alert.alert('Incorrect username or password!'))
-      })
+    this.setState({loading:true});
+      db.collection('User')
+        .find({ username: this.state.username, pass: this.state.pass })
+        .then(docs => {
+        this.setState({loading:false});
+        docs.length
+          ? (this.setState({isLoggedIn:true,userData:docs[0].profile}),console.log(this.state))
+          : (Alert.alert('Incorrect username or password!'))
+        })
   }
   
 	_onPressRegister() {
@@ -133,7 +135,7 @@ export default class App extends React.Component {
 		  return (
 		  
         <View style={{ backgroundColor: '#1EE494', flex: 1 }}>
-			{loading && <NowLoading/>}
+			    {loading && <NowLoading/>}
           <View style={{ flex: 1, flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
             <Image
               source={require('./img/mapful.png')}
@@ -163,8 +165,7 @@ export default class App extends React.Component {
             </View>
           </View>
         </View>
-    )
-    } else {
+    )} else {
       return (
         <View  style={{ justifyContent: 'center', flex:1}}>
           <Header

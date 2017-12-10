@@ -148,63 +148,61 @@ export default class Home extends React.Component {
 
   render() {
     const { pins } = this.state;
-	return (
-	<View style = {{flex:1}} >
-	 {this.state.goToProfile!=''&&
-		  <View style={{
-          position: 'absolute',
-          zIndex: 1000,
-		  backgroundColor:'white',
-		  height: '100%',
-		  width: '100%'
-		  }}>
-		<Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,back:()=>{
-				this.setState({goToProfile:''})}
-					, guest:this.props.screenProps.guest
-					
-					, callback:()=>{
-						db.collection('User')
-								  .find({ username: this.state.goToProfile})
-								  .then(docs => {(
-								  console.log(docs[0]),
-								this.setState({
-								profileData:docs[0].profile}))});
-								this.props.screenProps.callback()}
-								}}/>
-		</View>
-		}
-      <LazyloadScrollView
-        style={styles.home}
-        name="lazyload-scrollview"
-        refreshControl={
-          <RefreshControl
-            refreshing={this.state.refreshing}
-            onRefresh={this.onRefresh}
-          />
+    return (
+      <View style = {{flex:1}} >
+        {this.state.goToProfile!=''&&
+          <View style={{
+              position: 'absolute',
+              zIndex: 1000,
+          backgroundColor:'white',
+          height: '100%',
+          width: '100%'
+          }}>
+        <Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,back:()=>{
+            this.setState({goToProfile:''})}
+              , guest:this.props.screenProps.guest
+              
+              , callback:()=>{
+                db.collection('User')
+                      .find({ username: this.state.goToProfile})
+                      .then(docs => {(
+                      console.log(docs[0]),
+                    this.setState({
+                    profileData:docs[0].profile}))});
+                    this.props.screenProps.callback()}
+                    }}/>
+          </View>
         }
-      >
-        {pins.map(pin => (
-          <Post
-            key={pin._id}
-            host="lazyload-scrollview"
-            pin={pin}
-            likePin={this.likePin}
-            user={this.props.screenProps.user}
-            updatePins={this.updatePins}
-            userData={this.props.screenProps.userData}
-			goToProfile={(user)=>{
-				db.collection('User')
-				  .find({ username: user})
-				  .then(docs => {(
-				  console.log(docs[0]),
-				this.setState({
-				profileData:docs[0].profile,goToProfile:user}))})
-			}}
-          />
-        ))}
-      </LazyloadScrollView>
-	  </View>
-	)
+        <LazyloadScrollView
+          style={styles.home}
+          name="lazyload-scrollview"
+          refreshControl={
+            <RefreshControl
+              refreshing={this.state.refreshing}
+              onRefresh={this.onRefresh}
+            />
+          }
+        >
+          {pins.map(pin => (
+            <Post
+              key={pin._id}
+              host="lazyload-scrollview"
+              pin={pin}
+              likePin={this.likePin}
+              user={this.props.screenProps.user}
+              updatePins={this.updatePins}
+              userData={this.props.screenProps.userData}
+              goToProfile={(user) => {
+                db.collection('User')
+                  .find({ username: user})
+                  .then(docs => this.setState({ profileData: docs[0].profile, goToProfile: user }))
+                }
+              }
+            />
+          ))}
+        </LazyloadScrollView>
+      </View>
+    )
   }
 }
 
@@ -238,7 +236,6 @@ class Post extends React.Component {
       .then(() => this.textInput.clear());
   }
 
-
   render() {
     const { host, pin, likePin, user, submitComment } = this.props;
     const { openComment } = this.state;
@@ -260,9 +257,7 @@ class Post extends React.Component {
         }
 
         <Text style={styles.txt}>{pin.txt}</Text>
-        <View
-          style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, marginBottom: 5 }}
-        >
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 5, marginBottom: 5 }}>
           <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => likePin(pin._id)}>
             <Icon
               name="heart"
@@ -281,19 +276,17 @@ class Post extends React.Component {
           <View style={{ flexDirection: 'column', marginTop: 5, marginBottom: 5 }}>
             {pin.comments.map((comment, i) => (
               <View style={styles.comment} key={i}>
-			  
-                <TouchableOpacity
-				  onPress= {()=>this.props.goToProfile(comment.user)}>
-                <DeferredImage
-                  promise={mapIdToProfilePicture(comment.user)}
-                  then={<View style={{ width: 24, height: 24 }} />}
-                  style={{
-                    height: 24,
-                    width: 24,
-                    borderRadius: 12,
-                    marginRight: 6
-                  }}
-                />
+                <TouchableOpacity onPress= {()=>this.props.goToProfile(comment.user)}>
+                  <DeferredImage
+                    promise={mapIdToProfilePicture(comment.user)}
+                    then={<View style={{ width: 24, height: 24 }} />}
+                    style={{
+                      height: 24,
+                      width: 24,
+                      borderRadius: 12,
+                      marginRight: 6
+                    }}
+                  />
                 </TouchableOpacity>	
                 <Text style={styles.commentText}>{comment.txt}</Text>
               </View>

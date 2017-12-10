@@ -103,11 +103,11 @@ const styles = StyleSheet.create({
 	}
 });
 
-
 export default class Pin extends React.Component {
 	static navigationOptions = {
 		tabBarLabel: 'Pin'
 	};
+
 	constructor(props) {
 		super(props);
 		this.state = {
@@ -119,35 +119,33 @@ export default class Pin extends React.Component {
 			map:false,
 			imgArr:[]
 		};
-		console.log(this.state);
 	}
+
 	_onPressCurrentLocation() {
 		const Options = {
-		enableHighAccuracy: true,
-		timeout: 5000,
-		maximumAge: 0
+			enableHighAccuracy: true,
+			timeout: 5000,
+			maximumAge: 0
 		};
 		navigator.geolocation.getCurrentPosition(function success(pos) {
 			var crd = pos.coords;
-			console.log('Your current position is:');
-			console.log(`Latitude : ${crd.latitude}`);
-			console.log(`Longitude: ${crd.longitude}`);
-			console.log(`More or less ${crd.accuracy} meters.`);
 			this.setState({location:pos.coords})
-			}.bind(this), function error(err) {
-			console.warn(`ERROR(${err.code}): ${err.message}`);
-			Alert.alert('Cannot get your location information!')
-			}, Options);
+		}.bind(this), function error(err) {
+			Alert.alert('Cannot get your location information!');
+		}, Options);
 	}
+
 	_onPressLocationOnMap() {
-	this.setState({map:true});
+		this.setState({map:true});
 	}
+
 	async _onPressUploadImg() {
-			var res=await Expo.ImagePicker.launchImageLibraryAsync({base64:true});
-			if(res.cancelled==false){
-				this.setState({img:[...this.state.img, {path:res.uri,base64:res.base64}],numImg:(this.state.numImg+1)})
-			}
+		var res=await Expo.ImagePicker.launchImageLibraryAsync({base64:true});
+		if(res.cancelled==false){
+			this.setState({img:[...this.state.img, {path:res.uri,base64:res.base64}],numImg:(this.state.numImg+1)})
+		}
 	}
+
 	uploadImage(uri) {
 		  let timestamp = (Date.now() / 1000 | 0).toString();
 		  let api_key = '688836837148262'
@@ -161,13 +159,13 @@ export default class Pin extends React.Component {
 		  xhr.open('POST', upload_url);
 		  xhr.onload = () => {
 			var res=JSON.parse(xhr._response);
-			console.log(xhr._response);
 			var tem ={
 				version:res.version,
 				id:res.public_id
 			}
 			this.setState({imgArr:[...this.state.imgArr, tem]})
 		  };
+
 		  let formdata = new FormData();
 		  formdata.append('file', uri);
 		  formdata.append('timestamp', timestamp);
@@ -175,18 +173,22 @@ export default class Pin extends React.Component {
 		  formdata.append('signature', signature);
 		  xhr.send(formdata);
 	}
+
 	async _onPressUploadImg() {
-			var res=await Expo.ImagePicker.launchImageLibraryAsync({base64:true});
-			if(res.cancelled==false){
-				this.setState({img:[...this.state.img, {path:res.uri,base64:res.base64}],numImg:(this.state.numImg+1)})
-			}
+		var res=await Expo.ImagePicker.launchImageLibraryAsync({base64:true});
+		if(res.cancelled == false){
+			this.setState({img:[...this.state.img, {path:res.uri,base64:res.base64}],numImg:(this.state.numImg+1)})
+		}
 	}
-	 _onPressPin() {
+
+	_onPressPin() {
 		if(this.state.title==''){
 			Alert.alert('Title cannot be empty!');
 			return;
 		}
+
 		this.setState({loading:true});
+
 		this.state.img.map( (obj,i) =>{
 				if(obj.path){
 					var url= 'data:image/jpeg;base64,'+obj.base64
@@ -195,85 +197,90 @@ export default class Pin extends React.Component {
 					this.state.imgArr.push(obj);
 			}
 		)
-			var error=false;
+
+		var error=false;
 		var tid = setInterval(function(){
 			if(this.state.imgArr.length>=this.state.img.length){
 				clearInterval(tid);
-				console.log('start uploading data');
-				console.log(this.state.imgArr);
-				db.collection('Pins').updateOne(
-					 { _id: this.props.pin. _id },
-				{ $set:{
-					txt:this.state.txt, 
-					title:this.state.title, 
-					location:this.state.location,
-					image:this.state.imgArr}}).catch(err => {console.error(err),
-					error=true;
-					})
+				db.collection('Pins')
+					.updateOne(
+						{ _id: this.props.pin. _id },
+						{ $set:{
+							txt:this.state.txt, 
+							title:this.state.title, 
+							location:this.state.location,
+							image:this.state.imgArr}
+						})
+					.catch(err => {
+						console.error(err)
+						error=true;
+					});
 		
-			if(error){
-				Alert.alert('error!');
-				return;
-			}
-			Alert.alert('Pin is updated!');
-			this.props.callback();
-			}
-				
+				if(error){
+					Alert.alert('error!');
+					return;
+				}
+
+				Alert.alert('Pin is updated!');
+				this.props.callback();
+			}	
 		}.bind(this) ,1000);
 	}
+
 	render() {
 	  const { loading } = this.state;
+
       return (
         <View style={{ flex: 1, flexDirection: 'column' }}>
 			{loading && <NowLoading/>}
 			<View style={{ 
-				  position: 'absolute',
-				  zIndex: 100,
-				  top: 0,
-				  left: 0
-				}}>
+				position: 'absolute',
+				zIndex: 100,
+				top: 0,
+				left: 0
+			}}>
                 <TouchableOpacity>
                     <Icon2 name="arrow-back" color="black" size={30} onPress= {()=>this.props.callback()}/>
                 </TouchableOpacity>				
-                </View>
-				<Text style={styles.newpost}>
-	        		Edit the pin
-	        	</Text>
-				<View style={{ flex: 1, flexDirection: 'row'}}>
-	        		<TouchableOpacity style={styles.addbox} onPress={this._onPressUploadImg.bind(this)}>
-	        			<Icon name="plus" color="black" size={40}/>
-	        		</TouchableOpacity>
-	        		<TextInput style={styles.title}  placeholder="Write a title..." onChangeText={(title) => this.setState({title})} value = {this.state.title}/>
-        		</View>
-        		<TextInput textAlignVertical='top' multiline={true} style={styles.caption}  placeholder="Write a caption..." onChangeText={(txt) => this.setState({txt})} value = {this.state.txt}/>
-	        	<TouchableOpacity style={styles.mylocation} onPress={this._onPressCurrentLocation.bind(this)}>
-		        		<Icon2 name="my-location" color="black" size={40}/>
-	        	</TouchableOpacity>
-	        	<TouchableOpacity style={styles.pinlocation} onPress={this._onPressLocationOnMap.bind(this)}>
-	        		<Icon2 name="location-on" color="red" size={40}/>
-	        	</TouchableOpacity>
-	        	<TouchableOpacity style={styles.sharepin} onPress={this._onPressPin.bind(this)}>
-					<Text style={{fontWeight:'bold', color:'#1EE494'}}>update</Text>
-	        	</TouchableOpacity>
-				<View style={styles.picture}>
-					{this.state.img.map((obj,i) =>
-						<View key={i}>
-							{obj.path&&<Image key={i+1000} source={{uri:obj.path}} style={{height:160,width:216,}}/>}
-							{obj.version&&<Image key={i+1000} source={{ uri: `https://res.cloudinary.com/comp33302017/image/upload/v${obj.version}/${obj.id}` }} style={{height:160,width:216,}}/>}
-						<TouchableOpacity key={i-2000} style={styles.delete} onPress={()=>{
-						  var array = this.state.img;
-						  array.splice(i, 1);
-						  this.setState({img: array});
-						  }}>
-						  <Icon name="remove" color="black" size={40}/>
-						</TouchableOpacity>
-						</View>
-					  )}
-				</View>
+			</View>
+			<Text style={styles.newpost}>
+				Edit the pin
+			</Text>
+			<View style={{ flex: 1, flexDirection: 'row'}}>
+				<TouchableOpacity style={styles.addbox} onPress={this._onPressUploadImg.bind(this)}>
+					<Icon name="plus" color="black" size={40}/>
+				</TouchableOpacity>
+				<TextInput style={styles.title}  placeholder="Write a title..." onChangeText={(title) => this.setState({title})} value = {this.state.title}/>
+			</View>
+			<TextInput textAlignVertical='top' multiline={true} style={styles.caption}  placeholder="Write a caption..." onChangeText={(txt) => this.setState({txt})} value = {this.state.txt}/>
+			<TouchableOpacity style={styles.mylocation} onPress={this._onPressCurrentLocation.bind(this)}>
+					<Icon2 name="my-location" color="black" size={40}/>
+			</TouchableOpacity>
+			<TouchableOpacity style={styles.pinlocation} onPress={this._onPressLocationOnMap.bind(this)}>
+				<Icon2 name="location-on" color="red" size={40}/>
+			</TouchableOpacity>
+			<TouchableOpacity style={styles.sharepin} onPress={this._onPressPin.bind(this)}>
+				<Text style={{fontWeight:'bold', color:'#1EE494'}}>update</Text>
+			</TouchableOpacity>
+			<View style={styles.picture}>
+				{this.state.img.map((obj,i) =>
+					<View key={i}>
+						{obj.path&&<Image key={i+1000} source={{uri:obj.path}} style={{height:160,width:216,}}/>}
+						{obj.version&&<Image key={i+1000} source={{ uri: `https://res.cloudinary.com/comp33302017/image/upload/v${obj.version}/${obj.id}` }} style={{height:160,width:216,}}/>}
+					<TouchableOpacity key={i-2000} style={styles.delete} onPress={()=>{
+						var array = this.state.img;
+						array.splice(i, 1);
+						this.setState({img: array});
+						}}>
+						<Icon name="remove" color="black" size={40}/>
+					</TouchableOpacity>
+					</View>
+					)}
+			</View>
 		</View>
       );
-	return (
-	 
+	
+	  return (
         <View style={{ flex: 1, flexDirection: 'column' }}>
             <MapView
                 style={{ flex: 1 }}
