@@ -58,8 +58,8 @@ export default class UserList extends React.Component {
 				}
 				<Text style={{
 					height: 30,
-					marginLeft: '5%',
-					marginTop: '5%',
+					marginLeft: '13%',
+					marginTop: '2%',
 					fontSize: 25,
 					fontWeight: 'bold',
 					alignSelf: 'stretch',
