@@ -158,18 +158,24 @@ export default class Home extends React.Component {
           height: '100%',
           width: '100%'
           }}>
-        <Profile screenProps={{user: this.state.goToProfile,userData:this.state.profileData,back:()=>{
-            this.setState({goToProfile:''})}
-              , guest:this.props.screenProps.guest
-              
-              , callback:()=>{
+          <Profile
+            screenProps={{
+              user: this.state.goToProfile,
+              userData: this.state.profileData,
+              back: () => {
+                this.setState({goToProfile:''})
+              },
+              guest:this.props.screenProps.guest,
+              callback:() => {
                 db.collection('User')
-                      .find({ username: this.state.goToProfile})
-                      .then(docs => {(
-                    this.setState({
-                    profileData:docs[0].profile}))});
-                    this.props.screenProps.callback()}
-                    }}/>
+                  .find({ username: this.state.goToProfile})
+                  .then(docs => {
+                        this.setState({ profileData:docs[0].profile })
+                  });
+                this.props.screenProps.callback()
+              }
+            }}
+          />
           </View>
         }
         <LazyloadScrollView
@@ -182,11 +188,11 @@ export default class Home extends React.Component {
             />
           }
         >
-		  {pins.length==0 &&
-		  <View style={styles.pin}>
-				<Text>There is nothing to show on your home page yet, try to follow someone you are interested to see its newest actitivies!</Text>
-			</View>
-		  }
+          {pins.length==0 &&
+            <View style={styles.pin}>
+              <Text>There is nothing to show on your home page yet, try to follow someone you are interested to see its newest actitivies!</Text>
+            </View>
+          }
           {pins.map(pin => (
             <Post
               key={pin._id}
