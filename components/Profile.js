@@ -345,7 +345,6 @@ export default class Profile extends React.Component {
 											db.collection('User')
 											  .find({ username: user})
 											  .then(docs => {(
-											  console.log(docs[0]),
 											this.setState({
 											profileData:docs[0].profile,goToProfile:user}))})
 										}}

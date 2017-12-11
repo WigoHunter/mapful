@@ -88,7 +88,7 @@ export default class App extends React.Component {
         .then(docs => {
         this.setState({loading:false});
         docs.length
-          ? (this.setState({isLoggedIn:true,userData:docs[0].profile}),console.log(this.state))
+          ? (this.setState({isLoggedIn:true,userData:docs[0].profile}))
           : (Alert.alert('Incorrect username or password!'))
         })
   }
@@ -112,7 +112,7 @@ export default class App extends React.Component {
                       profile: {
                         pic: {version:'1510979878',id:'213810-200_b0flgc'},
                         intro: '',
-                        follow: ["Wigo", "ozzyulger"],
+                        follow: [],
                         followers: [],
                       }
                     })
